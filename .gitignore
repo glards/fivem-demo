@@ -2,6 +2,7 @@
 work
 txData
 data/server.cfg
+data/imgui.ini
 data/cache
 data/resources/\[gamemodes]
 data/resources/\[gameplay]
