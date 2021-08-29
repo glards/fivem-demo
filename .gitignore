@@ -1,0 +1,11 @@
+.server
+work
+txData
+data/server.cfg
+data/cache
+data/resources/\[gamemodes]
+data/resources/\[gameplay]
+data/resources/\[local]
+data/resources/\[managers]
+data/resources/\[system]
+data/resources/\[test]
