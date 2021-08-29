@@ -1,0 +1,600 @@
+
+
+
+Golf script
+===========
+
+
+Starting point :  -1371.909f, 56.286f, 52.6365f
+
+
+Props
+-----
+joaat("weapon_golfclub") -> club
+joaat("prop_golfflag") -> golf flag
+joaat("prop_golf_tee") -> golf tee
+STREAMING::REMOVE_IPL("GolfFlags") -> IPL golf flag
+
+Anim dicts
+----------
+MINI@GOLF
+MINI@GOLFAI
+amb@world_human_golf_player@male@base
+amb@world_human_golf_player@male@idle_a
+mini@golfhole_preview
+mini@golfreactions@generic@
+mini@golfclubhouse
+mini@golfclub_bag
+facials@p_m_zero@variations@happy
+move_m@golfer@
+
+
+golf.c
+------
+func_1269 -> golf scaleform
+func_809 -> is coord on golf course
+
+
+Hole 1
+Start : -1365.728f, 174.3154f, 57.01312f
+Start size : 20.75f * 20.75f
+
+Hole 2
+Start :
+Start size :
+
+Hole 3
+Start :
+Start size :
+
+Hole 4
+Start :
+Start size :
+
+Hole 5
+Start :
+Start size :
+
+Hole 6
+Start :
+Start size :
+
+Hole 7
+Start :
+Start size :
+
+Hole 8
+Start :
+Start size :
+
+
+Golf trail
+----------
+	GRAPHICS::GOLF_TRAIL_SET_RADIUS(0.025f, 0.3f, 0.025f);
+	GRAPHICS::GOLF_TRAIL_SET_COLOUR(255f, 255f, 255f, 100f, 255f, 255f, 255f, 100f, 255f, 255f, 255f, 100f);
+	GRAPHICS::GOLF_TRAIL_SET_SHADER_PARAMS(1f, 1f, 1f, 1f, 0.3f);
+
+Swing scaleform
+---------------
+	*iParam0 = unk_0x67D02A194A2FC2BD("golf");
+	iParam0->f_1 = unk_0x67D02A194A2FC2BD("golf_floating_ui");
+
+local scaleFormId = Citizen.InvokeNative(0x67D02A194A2FC2BD, "golf")
+local scaleFormId = Citizen.InvokeNative(0x67D02A194A2FC2BD, "golf_floating_ui")
+
+func_1279
+	GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(*uParam0, "SET_SWING_DISPLAY");
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(iParam1);
+    -- LIE_TEE (func_1283)
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING(sParam2);
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(iParam3);
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("GOLF_WIND_PLUS");
+	HUD::ADD_TEXT_COMPONENT_INTEGER(iParam5);
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+    -- fParam4 = club number
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(fParam4);
+    -- CLUB_1 (func_1282)
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING(sParam6);
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+
+    -- iVar0 = club number
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(iVar0);
+    
+    -- SWING_NORMAL (func_1281)
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING(sParam8);
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_BOOL(bParam12);
+
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("GOLF_SPIN");
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(iParam9);
+	GRAPHICS::SCALEFORM_MOVIE_METHOD_ADD_PARAM_FLOAT(fParam10);
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING("SHOT_NUM");
+	HUD::ADD_TEXT_COMPONENT_INTEGER(iParam11);
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+	GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+
+void func_447(char* sParam0)
+{
+	GRAPHICS::BEGIN_TEXT_COMMAND_SCALEFORM_STRING(sParam0);
+	GRAPHICS::END_TEXT_COMMAND_SCALEFORM_STRING();
+}
+
+void func_1361(int* iParam0)
+{
+	GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(*iParam0, "COURSE_PAR");
+	func_447("PAR_5");
+	func_447("PAR_4");
+	func_447("PAR_3");
+	func_447("PAR_4");
+	func_447("PAR_4");
+	func_447("PAR_3");
+	func_447("PAR_4");
+	func_447("PAR_5");
+	func_447("PAR_4");
+	func_447("PAR_TOTAL");
+	GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+}
+
+void func_1362(int* iParam0)
+{
+	GRAPHICS::BEGIN_SCALEFORM_MOVIE_METHOD(*iParam0, "SET_SCOREBOARD_TITLE");
+	func_447("TITLE_STANDING");
+	func_447("HOLE_ALLCAPS");
+	func_447("PAR_ALLCAPS");
+	func_447("SCORE_ALLCAPS");
+	func_447("SCORE_HOLEINONE");
+	func_447("SCORE_BELOW_PAR");
+	func_447("SCORE_ABOVE_PAR");
+	func_447("HOLE_1");
+	func_447("HOLE_2");
+	func_447("HOLE_3");
+	func_447("HOLE_4");
+	func_447("HOLE_5");
+	func_447("HOLE_6");
+	func_447("HOLE_7");
+	func_447("HOLE_8");
+	func_447("HOLE_9");
+	GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
+}
+
+Golf club prop
+--------------
+
+int func_694(var uParam0, int iParam1)
+{
+	if (iParam1 < 0 || iParam1 >= uParam0->f_15)
+	{
+		return joaat("prop_golf_driver");
+	}
+	switch ((*uParam0)[iParam1])
+	{
+		case 1:
+			return joaat("prop_golf_wood_01");
+			break;
+		
+		case 2:
+			return joaat("prop_golf_wood_01");
+			break;
+		
+		case 3:
+			return joaat("prop_golf_wood_01");
+			break;
+		
+		case 4:
+			return joaat("prop_golf_wood_01");
+			break;
+		
+		case 5:
+			return joaat("prop_golf_wood_01");
+			break;
+		
+		case 6:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 7:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 8:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 9:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 10:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 11:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 12:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 13:
+			return joaat("prop_golf_iron_01");
+			break;
+		
+		case 14:
+			return joaat("prop_golf_pitcher_01");
+			break;
+		
+		case 15:
+			return joaat("prop_golf_pitcher_01");
+			break;
+		
+		case 16:
+			return joaat("prop_golf_pitcher_01");
+			break;
+		
+		case 17:
+			return joaat("prop_golf_pitcher_01");
+			break;
+		
+		case 18:
+			return joaat("prop_golf_pitcher_01");
+			break;
+		
+		case 19:
+			return joaat("prop_golf_putter_01");
+			break;
+	}
+	return joaat("prop_golf_driver");
+}
+
+Green grid
+-----------
+
+void func_986(struct<3> Param0, int iParam3)
+{
+	struct<3> Var0;
+	struct<3> Var3;
+	struct<3> Var6;
+	float fVar9;
+	float fVar10;
+	float fVar11;
+	
+	fVar10 = 20f;
+	fVar11 = 0.08f;
+	switch (iParam3)
+	{
+		case 0:
+			Var0 = { -1120.569f, 222.185f, 64.814f };
+			Var3 = { -0.712f, 0.7f, 0f };
+			Var6 = { 14.92f, 24.48f, -0.63f };
+			fVar9 = 42f;
+			break;
+		
+		case 1:
+			Var0 = { -1326.193f, 162.31f, 56.974f };
+			Var3 = { -0.771f, 0.636f, 0.003f };
+			Var6 = { 19.48f, 24.34f, -0.63f };
+			fVar9 = 42f;
+			break;
+		
+		case 2:
+			Var0 = { -1238.702f, 106.882f, 56.462f };
+			Var3 = { 0.177f, 0.982f, 0.06f };
+			Var6 = { 15.72f, 27.98f, 0.1f };
+			fVar9 = 42f;
+			break;
+		
+		case 3:
+			Var0 = { -1099.278f, 10.541f, 50.81f };
+			Var3 = { -0.993f, 0.11f, -0.046f };
+			Var6 = { 33.05f, 36.35f, -0.63f };
+			fVar9 = 65f;
+			break;
+		
+		case 4:
+			Var0 = { -965.273f, -82.437f, 41.041f };
+			Var3 = { 0.549f, -0.835f, -0.031f };
+			Var6 = { 20.47f, 42.54f, -0.63f };
+			fVar9 = 42f;
+			break;
+		
+		case 5:
+			Var0 = { -1102.084f, -116.732f, 40.891f };
+			Var3 = { -0.485f, -0.875f, -0.006f };
+			Var6 = { 18.56f, 20f, -0.63f };
+			fVar9 = 42f;
+			break;
+		
+		case 6:
+			Var0 = { -1284.205f, 4.114f, 49.654f };
+			Var3 = { -0.997f, -0.018f, 0.076f };
+			Var6 = { 19.01f, 20f, 0.7f };
+			fVar9 = 42f;
+			break;
+		
+		case 7:
+			Var0 = { -1041.863f, -84.943f, 43.14f };
+			Var3 = { 0.799f, 0.6f, 0.033f };
+			Var6 = { 18.69f, 24.09f, 0.68f };
+			fVar9 = 42f;
+			break;
+		
+		case 8:
+			Var0 = { -1289.969f, 83.574f, 54.183f };
+			Var3 = { -1f, 0.004f, 0.005f };
+			Var6 = { 19.01f, 20f, -0.63f };
+			fVar9 = 42f;
+			break;
+	}
+
+Var0 = grid center
+Var3 = grid size
+Var6 = grid size
+fVar9 = scale
+fVar10 = glowIntensity
+fVar11 = heightDiff
+
+	Var0.f_2 = (Param0.f_2 + 0.5f);
+	GRAPHICS::TERRAINGRID_ACTIVATE(true);
+	GRAPHICS::TERRAINGRID_SET_PARAMS(Var0, Var3, Var6, fVar9, fVar10, Param0.f_2, fVar11);
+    
+	GRAPHICS::TERRAINGRID_SET_COLOURS(255, 0, 0, 64, 255, 255, 255, 5, 255, 255, 0, 64);
+}
+
+
+Holes
+=====
+
+Vector3 func_539(var uParam0, int iParam1)
+{
+	if (iParam1 < 0 || iParam1 >= uParam0->f_28)
+	{
+		return 0f, 0f, 0f;
+	}
+	switch (iParam1)
+	{
+		case 0:
+			return -1114.121f, 220.789f, 63.78f;
+			break;
+		
+		case 1:
+			return -1322.07f, 158.77f, 56.69f;
+			break;
+		
+		case 2:
+			return -1237.419f, 112.988f, 56.086f;
+			break;
+		
+		case 3:
+			return -1096.541f, 7.848f, 49.63f;
+			break;
+		
+		case 4:
+			return -957.386f, -90.412f, 39.161f;
+			break;
+		
+		case 5:
+			return -1103.516f, -115.163f, 40.444f;
+			break;
+		
+		case 6:
+			return -1290.633f, 2.771f, 49.219f;
+			break;
+		
+		case 7:
+			return -1034.944f, -83.144f, 42.919f;
+			break;
+		
+		case 8:
+			return -1294.775f, 83.51f, 53.804f;
+			break;
+	}
+	return 0f, 0f, 0f;
+}
+
+
+MINIMAP
+=======
+
+From native documentation SetMinimapGolfCourse :
+-------------------------------------------------
+// draw hole 2
+SetMinimapGolfCourse(2);
+
+// set the other minimap properties for this specific hole:
+SetRadarZoom(850);
+LockMinimapPosition(-1220.0f, 240.0f);
+LockMinimapAngle(90);
+ToggleStealthRadar(false);
+SetRadarBigmapEnabled(false, false);
+
+// Create the flag blip and set the sprite to the flag sprite.
+int blip = AddBlipForCoord(-1321.98f, 158.93f, 57.8f);
+SetBlipSprite(blip, 358);
+
+// result of this code example: https://i.imgur.com/DUnUzKS.png
+
+Turn golf minimap on
+
+iVar2 = hole number
+
+	HUD::SET_MINIMAP_GOLF_COURSE(iVar2);
+	HUD::TOGGLE_STEALTH_RADAR(false);
+	if (HUD::DOES_BLIP_EXIST(uParam1->f_56))
+	{
+		HUD::REMOVE_BLIP(&(uParam1->f_56));
+	}
+	uParam1->f_56 = func_1215(func_539(uParam1, iVar0), 0);
+	HUD::SET_BLIP_SPRITE(uParam1->f_56, 358);
+	func_1209(iVar0, bVar1);
+	HUD::SET_RADAR_ZOOM(SYSTEM::CEIL((1100f * fLocal_464)));
+	HUD::LOCK_MINIMAP_POSITION(fLocal_462, fLocal_463);
+	HUD::LOCK_MINIMAP_ANGLE(iLocal_465);
+
+Turn golf minimap off
+void func_1268()
+{
+	HUD::SET_MINIMAP_GOLF_COURSE_OFF();
+	HUD::UNLOCK_MINIMAP_ANGLE();
+	HUD::UNLOCK_MINIMAP_POSITION();
+	HUD::SET_RADAR_ZOOM(0);
+	if (!func_450())
+	{
+		HUD::TOGGLE_STEALTH_RADAR(true);
+	}
+}
+    
+void func_1209(int iParam0, bool bParam1)
+{
+	switch (iParam0)
+	{
+		case 0:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.81f;
+				fLocal_462 = -1222f;
+				fLocal_463 = 83f;
+			}
+			else
+			{
+				fLocal_464 = 0.003f;
+				fLocal_462 = -1142f;
+				fLocal_463 = 156f;
+			}
+			iLocal_465 = 280;
+			break;
+		
+		case 1:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.75f;
+				fLocal_462 = -1216f;
+				fLocal_463 = 247f;
+			}
+			else
+			{
+				fLocal_464 = 0.001f;
+				fLocal_462 = -1294f;
+				fLocal_463 = 195f;
+			}
+			iLocal_465 = 89;
+			break;
+		
+		case 2:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.1f;
+				fLocal_462 = -1274.5f;
+				fLocal_463 = 65f;
+			}
+			else
+			{
+				fLocal_464 = 0.1f;
+				fLocal_462 = -1274.5f;
+				fLocal_463 = 65f;
+			}
+			iLocal_465 = 264;
+			break;
+		
+		case 3:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.55f;
+				fLocal_462 = -1197f;
+				fLocal_463 = 1f;
+			}
+			else
+			{
+				fLocal_464 = 0.001f;
+				fLocal_462 = -1145f;
+				fLocal_463 = 0f;
+			}
+			iLocal_465 = 232;
+			break;
+		
+		case 4:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.75f;
+				fLocal_462 = -1090f;
+				fLocal_463 = -70f;
+			}
+			else
+			{
+				fLocal_464 = 0.001f;
+				fLocal_462 = -1004f;
+				fLocal_463 = -92f;
+			}
+			iLocal_465 = 220;
+			break;
+		
+		case 5:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.4f;
+				fLocal_462 = -1051f;
+				fLocal_463 = -55f;
+			}
+			else
+			{
+				fLocal_464 = 0.001f;
+				fLocal_462 = -1076f;
+				fLocal_463 = -76f;
+			}
+			iLocal_465 = 90;
+			break;
+		
+		case 6:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.75f;
+				fLocal_462 = -1164f;
+				fLocal_463 = 40f;
+			}
+			else
+			{
+				fLocal_464 = 0.085f;
+				fLocal_462 = -1250f;
+				fLocal_463 = 34f;
+			}
+			iLocal_465 = 57;
+			break;
+		
+		case 7:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.825f;
+				fLocal_462 = -1212f;
+				fLocal_463 = -120f;
+			}
+			else
+			{
+				fLocal_464 = 0.001f;
+				fLocal_462 = -1097f;
+				fLocal_463 = -109f;
+			}
+			iLocal_465 = 240;
+			break;
+		
+		case 8:
+			if (!bParam1)
+			{
+				fLocal_464 = 0.675f;
+				fLocal_462 = -1173f;
+				fLocal_463 = 117f;
+			}
+			else
+			{
+				fLocal_464 = 0.001f;
+				fLocal_462 = -1242f;
+				fLocal_463 = 106f;
+			}
+			iLocal_465 = 63;
+			break;
+	}
+}
