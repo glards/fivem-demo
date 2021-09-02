@@ -1,7 +1,10 @@
-local clientIsRunning = false
+local clientIsRunning = true
 local displayInfo = false
 
 function ClientThread()
+    SetPoliceIgnorePlayer(ped, true)
+    SetMaxWantedLevel(0)
+
     while clientIsRunning do
         Citizen.Wait(0)
 
@@ -31,19 +34,15 @@ function ClientThread()
         end
     end
 end
+Citizen.CreateThread(ClientThread)
 
-AddEventHandler('onResourceStart', function(resource)
+AddEventHandler('onClientResourceStart', function(resource)
     if resource == GetCurrentResourceName() then
         print('Starting bootstrap')
-        clientIsRunning = true
-        Citizen.CreateThread(ClientThread)
-
-        SetPoliceIgnorePlayer(ped, true)
-        SetMaxWantedLevel(0)
     end
 end)
 
-AddEventHandler('onResourceStop', function(resource)
+AddEventHandler('onClientResourceStop', function(resource)
     if resource == GetCurrentResourceName() then
         print('Stopping bootstrap')
         clientIsRunning = false
