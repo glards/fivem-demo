@@ -1,7 +1,7 @@
 .server
 work
 txData
-data/server.cfg
+data/server_secret.cfg
 data/imgui.ini
 data/cache
 data/resources/\[gamemodes]
