@@ -1,5 +1,6 @@
 
-local golfRunning = true
+local golfRunning = false
+local trailShown = false
 
 -- from func_1209
 local holes = {
@@ -103,6 +104,22 @@ function golfThread()
     -- Create the flag blip and set the sprite to the flag sprite.
     local flag = AddBlipForCoord(data.HolePos.x, data.HolePos.y, data.HolePos.z)
     SetBlipSprite(flag, 358)
+
+    -- Create golfbag
+    local golfbag = CreateObjectNoOffset(`prop_golf_bag_01b`,0,0,0,true,true,false)
+
+    local cnt = 10
+
+    local xPos = (-0.225 - (-0.444))
+    local yPos = -1.111
+    local zPos = 0.57
+
+    local xRot = 0
+    local yRot = 0
+    local zRot = (-87.0 + (180.0))
+
+    AttachEntityToEntity(golfbag, ped, 0, xPos, yPos, zPos, xRot, yRot, zRot, false, false, false, false, 2, true)
+
     while golfRunning do
         Citizen.Wait(0)
 
@@ -110,6 +127,12 @@ function golfThread()
 
     end
 
+    -- Remove golf bag
+    if DoesEntityExist(golfbag) then
+        DeleteEntity(golfbag)
+    end
+
+    -- Remove flag blip
     RemoveBlip(flag)
 
     SetMinimapGolfCourseOff()
@@ -127,3 +150,59 @@ RegisterCommand('golfoff', function(source, args, rawCommand)
 end, false)
 
 
+Citizen.CreateThread(function()
+    RequestIpl('GolfFlags')
+end)
+
+RegisterCommand('trailon', function(source, args, rawCommand)
+    trailShown = true
+    Citizen.CreateThread(trailThread)
+end)
+
+function trailThread()
+    GolfTrailSetRadius(0.025, 0.3, 0.025)
+    GolfTrailSetColour(255.0,255.0,255.0,100.0,255.0,255.0,255.0,100.0,255.0,255.0,255.0,100.0)
+    GolfTrailSetShaderParams(1.0,1.0,1.0,1.0,0.3)
+    
+
+    local ped = PlayerPedId()
+    local coord = GetEntityCoords(ped)
+
+    GolfTrailSetTessellation(8, 10)
+    GolfTrailSetPath(coord.x, coord.y, coord.z, 50.0, 0.0, 25.0, 0.1, coord.z , false)
+
+    GolfTrailSetEnabled(true)
+
+    print("MaxHeight : %.2f", GolfTrailGetMaxHeight())
+    for i=1,8 do
+        local cp = GolfTrailGetVisualControlPoint(i-1)
+        print(string.format("X: %.2f / Y: %.2f / Z: %.2f", cp.x, cp.y, cp.z))
+    end
+
+    while trailShown do
+        Citizen.Wait(0)
+
+        -- local maxHeight = GolfTrailGetMaxHeight()
+        -- local cp = GolfTrailGetVisualControlPoint(7)
+
+        -- SetTextScale(0.0, 0.3)
+        -- SetTextOutline()
+
+        -- BeginTextCommandDisplayText('STRING')
+        -- AddTextComponentSubstringPlayerName(
+        --     string.format("~r~maxHeight :%.2f~s~~n~X: %.2f~n~Y: %.2f~n~Z: %.2f",
+        --         maxHeight,
+        --         cp.x, cp.y, cp.z
+        --     )
+        -- )
+        -- EndTextCommandDisplayText(0, 0.75)
+
+    end
+
+    GolfTrailSetEnabled(false)
+
+end
+
+RegisterCommand('trailoff', function(source, args, rawCommand)
+    trailShown = false
+end)

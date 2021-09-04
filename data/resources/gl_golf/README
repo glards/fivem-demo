@@ -29,44 +29,472 @@ facials@p_m_zero@variations@happy
 move_m@golfer@
 
 
+
+Golf anim
+---------
+Anim dict : MINI@GOLF
+animName :
+Wood_swing_action
+Iron_swing_action
+Wedge_swing_action
+Putt_action
+putt_2_wedge
+wedge_2_putt
+putt_2_iron
+iron_2_putt
+wedge_2_iron
+iron_2_wedge
+iron_2_wood
+wood_2_iron
+wood_2_wedge
+wedge_2_wood
+Wood_shuffle
+Iron_shuffle
+Wedge_shuffle
+Putt_shuffle
+
+
 golf.c
 ------
 func_1269 -> golf scaleform
 func_809 -> is coord on golf course
+func_557 -> get ball surface
+func_804 -> material to surface
+func_1164 -> set ball state (coord + surface)
+func_841 -> club
+func_531 -> get current hole
+func_1203 -> tee position for hole
+func_1202 -> player position
+func_1131 -> calculate shot ???
+
+Var0 = { func_1203(uParam1, func_531(uParam3)) }; -- Get tee position for hole
+fVar10 = (func_1443(Var0, func_1202(uParam3)) + 90f); -- Vector heading
+func_1189(uParam3, fVar10);
+
+Material hit by ball :
+
+			func_1164(uParam2, ENTITY::GET_ENTITY_COORDS(iVar0, true), func_804(ENTITY::GET_LAST_MATERIAL_HIT_BY_ENTITY(iVar0)));
+
+int func_804(int iParam0)
+{
+	switch (iParam0)
+	{
+		case -461750719:
+		case 930824497:
+			return 4;
+		
+		case 581794674:
+		case -2041329971:
+		case -309121453:
+		case 555004797:
+		case -1885547121:
+		case -1915425863:
+			return 9;
+			break;
+		
+		case -2073312001:
+		case 627123000:
+			return 8;
+			break;
+		
+		case 1187676648:
+		case 282940568:
+		case 951832588:
+		case -840216541:
+		case 510490462:
+			return 1;
+			break;
+		
+		case 1333033863:
+			return 2;
+			break;
+		
+		case -1286696947:
+			return 3;
+			break;
+		
+		case -1595148316:
+			return 0;
+			break;
+		
+		case 435688960:
+			return 7;
+			break;
+	}
+	return -1;
+}
+	switch (func_557(uParam0))
+	{
+		case 2:
+			if (MISC::ABSF(uParam0->f_1.f_4) < 10f)
+			{
+				sVar0 = "scr_golf_strike_fairway";
+			}
+			else
+			{
+				sVar0 = "scr_golf_strike_fairway_bad";
+			}
+			break;
+		
+		case 4:
+			sVar0 = "scr_golf_strike_thick_grass";
+			break;
+		
+		case 0:
+			sVar0 = "scr_golf_strike_bunker";
+			break;
+		
+		case 3:
+			break;
+		
+		case 5:
+			if (uParam0->f_1 != 6 && func_528(uParam1, func_531(uParam0)) > 3)
+			{
+				sVar0 = "scr_golf_tee_perfect";
+			}
+			break;
+		
+		case 1:
+		case 7:
+		case -1:
+			break;
+	}
+
+	char* func_840(var uParam0, var uParam1, bool bParam2, bool bParam3)
+{
+	int iVar0;
+	int iVar1;
+	
+	iVar0 = func_695(uParam1);
+	iVar1 = func_841(uParam0, iVar0);
+	if (iVar1 <= 5 && !bParam2)
+	{
+		return "Wood_";
+	}
+	else if ((iVar1 > 5 && iVar1 <= 13) && !bParam2)
+	{
+		return "Iron_";
+	}
+	else if ((iVar1 > 13 && iVar1 <= 18) && bParam3)
+	{
+		return "Wedge_";
+	}
+	else if (iVar1 == 19)
+	{
+		return "Putt_";
+	}
+	if (bParam2)
+	{
+		return "Swing_";
+	}
+	return "";
+}
+
+void func_934(var uParam0, var uParam1, int iParam2, bool bParam3, bool bParam4)
+{
+	char* sVar0;
+	
+	sVar0 = "";
+	if (func_1197(uParam1, 1048576))
+	{
+		return;
+	}
+	switch (func_841(uParam0, func_939(uParam1)))
+	{
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			switch (func_557(uParam1))
+			{
+				case 2:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_GRASS_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_GRASS_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_GRASS_MASTER";
+					}
+					break;
+				
+				case 5:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_TEE_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_TEE_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_TEE_MASTER";
+					}
+					break;
+				
+				default:
+					if (func_557(uParam1) == 3)
+					{
+					}
+					else if (func_557(uParam1) == -1)
+					{
+					}
+					else if (func_557(uParam1) == 7)
+					{
+					}
+					else if (func_557(uParam1) == 8)
+					{
+					}
+					else if (func_557(uParam1) == 0)
+					{
+					}
+					else if (func_557(uParam1) == 1)
+					{
+					}
+					else if (func_557(uParam1) == 4)
+					{
+					}
+					break;
+			}
+			break;
+		
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+			switch (func_557(uParam1))
+			{
+				case 5:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_TEE_IRON_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_TEE_IRON_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_TEE_IRON_MASTER";
+					}
+					break;
+				
+				case 2:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_FAIRWAY_IRON_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_FAIRWAY_IRON_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_FAIRWAY_IRON_MASTER";
+					}
+					break;
+				
+				case 4:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_ROUGH_IRON_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_ROUGH_IRON_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_ROUGH_IRON_MASTER";
+					}
+					break;
+				
+				case 0:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_SAND_IRON_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_SAND_IRON_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_SAND_IRON_MASTER";
+					}
+					break;
+				
+				case 1:
+					sVar0 = "GOLF_SWING_TEE_IRON_MASTER";
+					break;
+				
+				default:
+					if (func_557(uParam1) == 3)
+					{
+					}
+					else if (func_557(uParam1) == -1)
+					{
+					}
+					else if (func_557(uParam1) == 7)
+					{
+					}
+					else if (func_557(uParam1) == 8)
+					{
+					}
+					break;
+			}
+			break;
+		
+		case 15:
+		case 17:
+		case 18:
+		case 14:
+		case 16:
+			switch (func_557(uParam1))
+			{
+				case 5:
+				case 2:
+				case 3:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_CHIP_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_CHIP_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_CHIP_MASTER";
+					}
+					break;
+				
+				case 4:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_CHIP_GRASS_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_CHIP_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_CHIP_GRASS_MASTER";
+					}
+					break;
+				
+				case 0:
+					if (bParam4)
+					{
+						sVar0 = "GOLF_SWING_CHIP_SAND_LIGHT_MASTER";
+					}
+					else if (bParam3)
+					{
+						sVar0 = "GOLF_SWING_CHIP_SAND_PERFECT_MASTER";
+					}
+					else
+					{
+						sVar0 = "GOLF_SWING_CHIP_SAND_MASTER";
+					}
+					break;
+				
+				case 1:
+					sVar0 = "GOLF_SWING_CHIP_MASTER";
+					break;
+				
+				default:
+					if (func_557(uParam1) == -1)
+					{
+					}
+					else if (func_557(uParam1) == 7)
+					{
+					}
+					else if (func_557(uParam1) == 8)
+					{
+					}
+					break;
+			}
+			break;
+		
+		case 19:
+			sVar0 = "GOLF_SWING_PUTT_MASTER";
+			break;
+	}
+	if (!func_461(sVar0))
+	{
+		if (iParam2 || !ENTITY::DOES_ENTITY_EXIST(func_1205(uParam1)))
+		{
+			AUDIO::PLAY_SOUND_FROM_COORD(-1, sVar0, func_1202(uParam1), 0, false, 0, false);
+		}
+		else
+		{
+			AUDIO::PLAY_SOUND_FROM_ENTITY(-1, sVar0, func_1205(uParam1), 0, false, 0);
+		}
+	}
+}
 
 
-Hole 1
-Start : -1365.728f, 174.3154f, 57.01312f
-Start size : 20.75f * 20.75f
 
-Hole 2
-Start :
-Start size :
+Power ratio
+-----------
+	switch (func_557(uParam1))
+	{
+		case 5:
+		case 3:
+		case 2:
+			fVar4 = (fVar4 * 0.85f);
+			break;
+		
+		case 4:
+		case 1:
+			fVar4 = (fVar4 * 0.825f);
+			break;
+		
+		case 0:
+		case 7:
+		case -1:
+			fVar4 = (fVar4 * 0.8f);
+			break;
+	}
 
-Hole 3
-Start :
-Start size :
-
-Hole 4
-Start :
-Start size :
-
-Hole 5
-Start :
-Start size :
-
-Hole 6
-Start :
-Start size :
-
-Hole 7
-Start :
-Start size :
-
-Hole 8
-Start :
-Start size :
-
+	if (func_899(uParam1) == 3)
+	{
+		if (iVar3 <= 14)
+		{
+			fVar4 = (fVar4 * 1.06f);
+		}
+		if (iVar3 >= 14)
+		{
+			fVar1 = (fVar1 - 0.06f);
+		}
+	}
+	if (func_899(uParam1) == 2)
+	{
+		fVar1 = (fVar1 / 1.9f);
+		if (iVar3 == 17)
+		{
+			fVar4 = (fVar4 * (1.08f - 0.08f));
+		}
+		else if (iVar3 >= 12)
+		{
+			fVar4 = (fVar4 * (1.08f - 0.03f));
+		}
+		else
+		{
+			fVar4 = (fVar4 * 1.08f);
+		}
+	}
 
 Golf trail
 ----------
@@ -162,8 +590,8 @@ void func_1362(int* iParam0)
 	GRAPHICS::END_SCALEFORM_MOVIE_METHOD();
 }
 
-Golf club prop
---------------
+Golf club 
+---------
 
 int func_694(var uParam0, int iParam1)
 {
@@ -250,6 +678,203 @@ int func_694(var uParam0, int iParam1)
 			break;
 	}
 	return joaat("prop_golf_driver");
+}
+
+-- power from club ?
+float func_942(var uParam0, int iParam1)
+{
+	if (iParam1 < 0 || iParam1 >= uParam0->f_15)
+	{
+		return 0f;
+	}
+	switch ((*uParam0)[iParam1])
+	{
+		case 1:
+			return (220f / 1.85f);
+			break;
+		
+		case 2:
+			return (210f / 1.85f);
+			break;
+		
+		case 3:
+			return (200f / 1.85f);
+			break;
+		
+		case 4:
+			return (190f / 1.85f);
+			break;
+		
+		case 5:
+			return (180f / 1.85f);
+			break;
+		
+		case 6:
+			return (180f / 1.85f);
+			break;
+		
+		case 7:
+			return (170f / 1.85f);
+			break;
+		
+		case 8:
+			return (160f / 1.85f);
+			break;
+		
+		case 9:
+			return (150f / 1.85f);
+			break;
+		
+		case 10:
+			return (140f / 1.85f);
+			break;
+		
+		case 11:
+			return (130f / 1.85f);
+			break;
+		
+		case 12:
+			return (120f / 1.85f);
+			break;
+		
+		case 13:
+			return (110f / 1.85f);
+			break;
+		
+		case 14:
+			return (100f / 1.85f);
+			break;
+		
+		case 15:
+			return (85f / 1.85f);
+			break;
+		
+		case 16:
+			return (75f / 1.85f);
+			break;
+		
+		case 17:
+			return (65f / 1.85f);
+			break;
+		
+		case 18:
+			return (40f / 1.85f);
+			break;
+		
+		case 19:
+			return (30f / 1.85f);
+			break;
+	}
+	return 0f;
+}
+
+int func_943(int iParam0)
+{
+	char cVar0[32];
+	char cVar8[32];
+	char cVar16[32];
+	char cVar24[32];
+	
+	if (!PED::IS_PED_INJURED(iParam0))
+	{
+		StringCopy(&cVar0, "Wood_swing_action", 32);
+		StringCopy(&cVar8, "Iron_swing_action", 32);
+		StringCopy(&cVar16, "Wedge_swing_action", 32);
+		StringCopy(&cVar24, "Putt_action", 32);
+		if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar0, 3))
+		{
+			if (ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar0) > 0.16f)
+			{
+				return 1;
+			}
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar8, 3))
+		{
+			if (ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar8) > 0.134f)
+			{
+				return 1;
+			}
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar16, 3))
+		{
+			if (ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar16) > 0.119f)
+			{
+				return 1;
+			}
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar24, 3))
+		{
+			if (ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar24) > 0.159f)
+			{
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+var func_944(bool bParam0)
+{
+	if (!bParam0)
+	{
+		return func_946();
+	}
+	return func_945();
+}
+
+char* func_945()
+{
+	return "MINI@GOLF";
+}
+
+char* func_946()
+{
+	return "MINI@GOLFAI";
+}
+
+float func_954(int iParam0)
+{
+	char cVar0[32];
+	char cVar8[32];
+	char cVar16[32];
+	char cVar24[32];
+	
+	if (!PED::IS_PED_INJURED(iParam0))
+	{
+		StringCopy(&cVar0, "Wood_swing_intro", 32);
+		StringCopy(&cVar8, "Iron_swing_intro", 32);
+		StringCopy(&cVar16, "Wedge_swing_intro", 32);
+		StringCopy(&cVar24, "Putt_intro", 32);
+		if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar0, 3))
+		{
+			return ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar0);
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar8, 3))
+		{
+			return ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar8);
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar16, 3))
+		{
+			return ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar16);
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(0), &cVar24, 3))
+		{
+			return ENTITY::GET_ENTITY_ANIM_CURRENT_TIME(iParam0, func_944(0), &cVar24);
+		}
+		if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(1), "Wood_swing_idle", 3))
+		{
+			return 1f;
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(1), "Iron_swing_idle", 3))
+		{
+			return 1f;
+		}
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(iParam0, func_944(1), "Wedge_swing_idle", 3))
+		{
+			return 1f;
+		}
+	}
+	return 0f;
 }
 
 Green grid
@@ -597,4 +1222,52 @@ void func_1209(int iParam0, bool bParam1)
 			iLocal_465 = 63;
 			break;
 	}
+}
+
+-- Tee position
+Vector3 func_1203(var uParam0, int iParam1)
+{
+	if (iParam1 < 0 || iParam1 >= uParam0->f_28)
+	{
+		return 0f, 0f, 0f;
+	}
+	switch (iParam1)
+	{
+		case 0:
+			return -1252.974f, 182.4325f, 61.3071f;
+			break;
+		
+		case 1:
+			return -1222.204f, 150.2919f, 58.7062f;
+			break;
+		
+		case 2:
+			return -1240.082f, 105.7823f, 55.6871f;
+			break;
+		
+		case 3:
+			return -1132.487f, 74.15947f, 55.23262f;
+			break;
+		
+		case 4:
+			return -1022.111f, -34.77494f, 44.37743f;
+			break;
+		
+		case 5:
+			return -1100.057f, -114.277f, 40.5368f;
+			break;
+		
+		case 6:
+			return -1225.207f, -54.2714f, 44.1932f;
+			break;
+		
+		case 7:
+			return -1159.322f, -26.5465f, 44.7971f;
+			break;
+		
+		case 8:
+			return -1177.194f, 34.219f, 50.8363f;
+			break;
+	}
+	return 0f, 0f, 0f;
 }
