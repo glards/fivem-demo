@@ -36,13 +36,13 @@ function ClientThread()
 end
 Citizen.CreateThread(ClientThread)
 
-AddEventHandler('onClientResourceStart', function(resource)
+AddEventHandler('onResourceStart', function(resource)
     if resource == GetCurrentResourceName() then
         print('Starting bootstrap')
     end
 end)
 
-AddEventHandler('onClientResourceStop', function(resource)
+AddEventHandler('onResourceStop', function(resource)
     if resource == GetCurrentResourceName() then
         print('Stopping bootstrap')
         clientIsRunning = false
