@@ -49,8 +49,12 @@ Citizen.CreateThread(function()
             if dist < 1.5 and IsControlJustPressed(0, 38) then
                 local otherPortal = findPortalByName(portal.LinkTo)
                 if otherPortal ~= nil then
+                    DoScreenFadeOut(500)
+                    Citizen.Wait(500)
                     SetEntityCoords(ped, otherPortal.Pos.x, otherPortal.Pos.y, otherPortal.Pos.z, true, true, true, false)
                     SetEntityHeading(ped, otherPortal.Pos.w)
+                    Citizen.Wait(100)
+                    DoScreenFadeIn(500)
                 end
             end
         end
