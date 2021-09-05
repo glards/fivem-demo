@@ -6,7 +6,7 @@ AddEventHandler('gl_garage:spawn', function (modelHash, posX, posY, posZ, head)
     --local playerIdx = GetPlayerFromServerId(source)
     --local ped = GetPlayerPed(playerIdx)
 
-    print(modelhash)
+    print(modelHash)
     pos = vector3(posX, posY, posZ)
     print(pos)
     print(head)
