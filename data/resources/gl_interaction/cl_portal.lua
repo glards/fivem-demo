@@ -53,6 +53,9 @@ Citizen.CreateThread(function()
                     Citizen.Wait(500)
                     SetEntityCoords(ped, otherPortal.Pos.x, otherPortal.Pos.y, otherPortal.Pos.z, true, true, true, false)
                     SetEntityHeading(ped, otherPortal.Pos.w)
+                    if portal.Trigger ~= nil then
+                        portal.Trigger()
+                    end
                     Citizen.Wait(100)
                     DoScreenFadeIn(500)
                 end
