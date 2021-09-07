@@ -123,6 +123,14 @@ function nextPos(pos)
 end
 
 function posToRot(pos)
+    if pos < 1 then
+        pos = 1
+    end
+
+    if pos > 20 then
+        pos = 20
+    end
+
     local rot = (pos-1)*-18.0
     if rot < 0.0 then
         rot = rot + 360.0
@@ -185,13 +193,6 @@ end, false)
 
 RegisterCommand('wheel', function(source, args, rawCommand)
     local idx = tonumber(args[1]) or 1
-    if idx < 1 then
-        idx = 1
-    end
-    if idx > 20 then
-        idx = 20
-    end
-
     local rot = posToRot(idx)
 
     SetEntityRotation(wheel, 0.0, rot, 0.0, 2, true)
@@ -203,10 +204,17 @@ AddEventHandler('onResourceStop', function(resource)
     if resource == GetCurrentResourceName() then
         DeleteEntity(wheel)
         wheel = nil
-        print("Stopping gl_casino")
     end
 end)
 
-
 RegisterNetEvent('gl_casino:luckywheel:setSpin')
+AddEventHandler('gl_casino:luckywheel:setSpin', function(pos)
+    local rot = posToRot(pos)
+
+    SetEntityRotation(wheel, 0.0, rot, 0.0, 2, true)
+end)
+
+RegisterNetEvent('gl_casino:luckywheel:spinTo')
+AddEventHandler('gl_casino:luckywheel:spinTo', function(pos)
+end)
 
