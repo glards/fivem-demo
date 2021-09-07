@@ -1,13 +1,24 @@
 
-
 local Portals = {}
 local PortalNameMap = {}
 
-
-function addPortals(portals)
-    for i=1,#portals do
-        table.insert(Portals, portals[i])
+function addPortals(p)
+    newPortals = {}
+    for i=1,#Portals do
+        local found = false
+        for j=1,#p do
+            if Portals[i].Name == p[j].Name then
+                found = true
+            end
+        end
+        if not found then
+            table.insert(newPortals, Portals[i])
+        end
     end
+    for i=1,#p do
+        table.insert(newPortals, p[i])
+    end
+    Portals = newPortals
     PortalNameMap = makeMap(Portals)
 end
 exports('addPortals', addPortals)
@@ -33,7 +44,6 @@ function findPortalByName(name)
 end
 
 Citizen.CreateThread(function()
-
     while true do
         Citizen.Wait(0)
 
@@ -53,13 +63,22 @@ Citizen.CreateThread(function()
                     Citizen.Wait(500)
                     SetEntityCoords(ped, otherPortal.Pos.x, otherPortal.Pos.y, otherPortal.Pos.z, true, true, true, false)
                     SetEntityHeading(ped, otherPortal.Pos.w)
+                    DoScreenFadeIn(500)
                     if portal.Trigger ~= nil then
                         portal.Trigger()
                     end
-                    Citizen.Wait(100)
-                    DoScreenFadeIn(500)
+                else
+                    print('Unable to find other portal')
                 end
             end
         end
     end
 end)
+
+RegisterCommand('portals', function(source, args, rawCommand)
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+    for k,v in pairs(Portals) do
+        print(string.format("%d: %s -> %s (Pos: %s / Dist: %2f)", k, v.Name, v.LinkTo, v.Pos, #(coords - v.Pos.xyz)))
+    end
+end, false)
