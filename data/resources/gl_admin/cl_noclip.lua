@@ -16,8 +16,6 @@ local SPRINT_FACTOR = 10.0
 local isNoClip = false
 
 function NoClip()
-    print('MoveInNoClip started')
-
     local ped = PlayerPedId()
 
     DisableAllControlActions(ped)
@@ -30,26 +28,11 @@ function NoClip()
     FreezeEntityPosition(ped, true)
     SetEntityCollision(ped, false, false)
 
-
-
-    --NetworkSetEntityInvisibleToNetwork(ped, true)
-    --SetEntityVisible(ped, false, 0)
-    --SetLocalPlayerVisibleLocally(true)
-    
     while isNoClip do
         Citizen.Wait(0)
 
         SetLocalPlayerVisibleLocally(true)
         SetEveryoneIgnorePlayer(ped, true)
-
-        -- cnt = cnt + 1
-        -- if cnt % 10 == 0 then
-        --     print('INPUT_MOVE_UD = ', GetControlNormal(PLAYER_CONTROL, INPUT_MOVE_UD))
-        --     print('INPUT_MOVE_LR = ', GetControlNormal(PLAYER_CONTROL, INPUT_MOVE_LR))
-        --     print('INPUT_SPRINT = ', GetControlNormal(PLAYER_CONTROL, INPUT_SPRINT))
-        --     print('INPUT_JUMP = ', GetControlNormal(PLAYER_CONTROL, INPUT_JUMP))
-        --     print('INPUT_DUCK = ', GetControlNormal(PLAYER_CONTROL, INPUT_DUCK))
-        -- end
 
         local rightFactor = GetControlNormal(PLAYER_CONTROL, INPUT_MOVE_LR)
         local forwardFactor = -GetControlNormal(PLAYER_CONTROL, INPUT_MOVE_UD)
@@ -91,8 +74,6 @@ function NoClip()
     SetEntityInvincible(ped, false)
     SetPlayerInvincible(ped, false)
     EnableAllControlActions(ped)
-
-    print('MoveInNoClip ended')
 end
 
 function DrawText(x, y, text, ...)
