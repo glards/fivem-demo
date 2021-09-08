@@ -99,7 +99,6 @@ function playWheelAnim(wheel, force, wheelPosition)
     local prevPosition = wheelPosition
     local anim = animNames[force][wheelPosition]
 
-    print("Playing anim", anim)
     SetEntityRotation(wheel, 0.0, 0.0, 0.0, 2, true)
     PlayEntityAnim(wheel, anim, animDict, 1.0, false, true, false, 0.0, 2)
     ForceEntityAiAndAnimationUpdate(wheel)
