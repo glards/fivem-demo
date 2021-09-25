@@ -2,5 +2,6 @@
     "Lua.workspace.library": [
         "D:\\Perso\\fivem-demo\\.server\\citizen\\scripting\\lua\\"
     ],
-    "Lua.workspace.useGitIgnore": false
+    "Lua.workspace.useGitIgnore": false,
+    "Lua.workspace.maxPreload": 2000
 }
