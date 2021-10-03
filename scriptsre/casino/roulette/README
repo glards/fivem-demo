@@ -1,0 +1,1065 @@
+
+Dealer create:
+--------------
+
+int func_24(bool bParam0)
+{
+	if (bParam0)
+	{
+		return MISC::GET_HASH_KEY("s_f_y_casino_01");
+	}
+	return MISC::GET_HASH_KEY("S_M_Y_Casino_01");
+}
+
+int func_105(var uParam0, int iParam1)
+{
+	bool bVar0;
+	int iVar1;
+	int iVar2;
+	
+	if (!NETWORK::NETWORK_IS_HOST_OF_THIS_SCRIPT())
+	{
+		return 0;
+	}
+	func_4373();
+	if (!func_4372())
+	{
+		return 0;
+	}
+	if (!NETWORK::CAN_REGISTER_MISSION_PEDS(1))
+	{
+		return 0;
+	}
+	bVar0 = func_4371(iParam1);
+	iVar1 = func_24(bVar0);
+	iVar2 = PED::CREATE_PED(26, iVar1, func_4368(iParam1), func_16(iParam1), true, true);
+	ENTITY::SET_ENTITY_CAN_BE_DAMAGED(iVar2, false);
+	PED::SET_PED_AS_ENEMY(iVar2, false);
+	PED::SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(iVar2, true);
+	PED::SET_PED_RESET_FLAG(iVar2, 249, true);
+	PED::SET_PED_CONFIG_FLAG(iVar2, 185, true);
+	PED::SET_PED_CONFIG_FLAG(iVar2, 108, true);
+	ENTITY::_0x352E2B5CF420BF3B(iVar2, 1);
+	PED::SET_PED_CAN_EVASIVE_DIVE(iVar2, false);
+	PED::_0x2F3C3D9F50681DE4(iVar2, true);
+	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(iVar2, false);
+	PED::SET_PED_CONFIG_FLAG(iVar2, 208, true);
+	ENTITY::SET_ENTITY_AS_MISSION_ENTITY(iVar2, true, false);
+	func_109(&iVar2, bVar0, iParam1);
+	func_107(&iVar2, bVar0, iParam1);
+	func_106();
+	uParam0->f_1357.f_288[iParam1] = NETWORK::PED_TO_NET(iVar2);
+	return 1;
+}
+
+Vector3 func_4368(int iParam0)
+{
+	return func_4369(func_4370(), iParam0) + func_19(iParam0);
+}
+Vector3 func_4370()
+{
+	return -0.68f, 0.97f, 0f;
+}
+
+Vector3 func_4369(struct<3> Param0, int iParam3)
+{
+	float fVar0;
+	return func_3452(Param0, func_18(iParam3));
+}
+
+
+Vector3 func_3452(struct<3> Param0, float fParam3)
+{
+	struct<3> Var0;
+	float fVar3;
+	float fVar4;
+	
+	fVar3 = SYSTEM::SIN(fParam3);
+	fVar4 = SYSTEM::COS(fParam3);
+	Var0.x = ((Param0.x * fVar4) - (Param0.f_1 * fVar3));
+	Var0.f_1 = ((Param0.x * fVar3) + (Param0.f_1 * fVar4));
+	Var0.f_2 = Param0.f_2;
+	return Var0;
+}
+
+float func_18(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return -135f;
+		
+		case 1:
+			return 45f;
+		
+		case 2:
+			return 135f;
+		
+		case 3:
+			return -45f;
+		
+		case 4:
+			return -45f;
+		
+		case 5:
+			return 135f;
+		
+		default:
+	}
+	return 0f;
+}
+
+Roulette prop :
+---------------
+int func_4493(int iParam0, bool bParam1)
+{
+	int iVar0;
+	int iVar1;
+	struct<3> Var2;
+	float fVar5;
+	int iVar6;
+	
+	iVar0 = func_4496(iParam0);
+	if (bParam1)
+	{
+		STREAMING::REQUEST_MODEL(iVar0);
+	}
+	if (!STREAMING::HAS_MODEL_LOADED(iVar0))
+	{
+		return 0;
+	}
+	iVar1 = func_4495(iParam0, func_110(iParam0));
+	Var2 = { func_19(iParam0) };
+	fVar5 = func_18(iParam0);
+	if (Global_1703173)
+	{
+		iVar6 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(Var2, 1f, iVar0, false, false, false);
+		if (!ENTITY::DOES_ENTITY_EXIST(iVar6))
+		{
+			iVar6 = OBJECT::CREATE_OBJECT_NO_OFFSET(iVar0, Var2, false, false, false);
+		}
+		else
+		{
+			ENTITY::SET_ENTITY_AS_MISSION_ENTITY(iVar6, false, true);
+		}
+	}
+	else
+	{
+		iVar6 = OBJECT::CREATE_OBJECT_NO_OFFSET(iVar0, Var2, false, false, false);
+	}
+	ENTITY::SET_ENTITY_HEADING(iVar6, fVar5);
+	OBJECT::_SET_OBJECT_TEXTURE_VARIATION(iVar6, iVar1);
+	func_4494(&iVar6, iParam0);
+	if (bParam1)
+	{
+		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(iVar0);
+	}
+	return iVar6;
+}
+	
+int func_110(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			return 1;
+		
+		default:
+	}
+	return 0;
+}
+
+int func_4495(int iParam0, bool bParam1)
+{
+	if (bParam1)
+	{
+		return 3;
+	}
+	return 0;
+}
+
+int func_4496(int iParam0)
+{
+	if (func_110(iParam0))
+	{
+		return func_4498();
+	}
+	return func_4497();
+}
+
+int func_4497()
+{
+	return joaat("vw_prop_casino_roulette_01");
+}
+
+int func_4498()
+{
+	return joaat("vw_prop_casino_roulette_01b");
+}
+
+Vector3 func_19(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return 1144.814f, 268.2634f, -52.8409f;
+		
+		case 1:
+			return 1150.355f, 262.7224f, -52.8409f;
+		
+		case 2:
+			return 1133.958f, 262.1071f, -52.0409f;
+		
+		case 3:
+			return 1129.595f, 267.2637f, -52.0409f;
+		
+		case 4:
+			return 1144.618f, 252.2411f, -52.0409f;
+		
+		case 5:
+			return 1148.981f, 247.0846f, -52.0409f;
+		
+		default:
+	}
+	return 0f, 0f, 0f;
+}
+
+int func_4477(var uParam0, int iParam1, bool bParam2)
+{
+	int iVar0;
+	
+	if (func_4378(iParam1))
+	{
+		return 1;
+	}
+	if (ENTITY::DOES_ENTITY_EXIST(uParam0->f_1212[iParam1 /*23*/]))
+	{
+		return 1;
+	}
+	iVar0 = func_4478();
+	if (!STREAMING::HAS_MODEL_LOADED(iVar0))
+	{
+		return 0;
+	}
+	uParam0->f_1212[iParam1 /*23*/] = OBJECT::CREATE_OBJECT_NO_OFFSET(iVar0, func_19(iParam1), false, true, false);
+	ENTITY::SET_ENTITY_VISIBLE(uParam0->f_1212[iParam1 /*23*/], !bParam2, false);
+	return 1;
+}
+
+int func_4478()
+{
+	return joaat("vw_prop_roulette_ball");
+}
+
+
+Anims for roulette :
+--------------------
+
+-- Dealer anim
+char* func_10(int iParam0, int iParam1, int iParam2)
+{
+	if (iParam1 == 3)
+	{
+		switch (iParam0)
+		{
+			case 20:
+				return func_14(iParam2);
+			
+			case 21:
+				return func_13(iParam2);
+			
+			default:
+		}
+	}
+	else
+	{
+		switch (iParam0)
+		{
+			case 20:
+				return func_12(iParam2);
+			
+			case 21:
+				return func_11(iParam2);
+			}
+		
+		default:
+	}
+	switch (iParam0)
+	{
+		case 19:
+			return "idle";
+		
+		case 22:
+			return "spin_wheel";
+		
+		case 27:
+			return "clear_chips_intro";
+		
+		case 24:
+			return "clear_chips_zone1";
+		
+		case 25:
+			return "clear_chips_zone2";
+		
+		case 26:
+			return "clear_chips_zone3";
+		
+		case 28:
+			return "clear_chips_outro";
+		
+		case 23:
+			return "no_more_bets";
+		
+		default:
+	}
+	return "";
+}
+
+char* func_11(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return "EMPTY_TABLE_IDLE_VAR01";
+		
+		case 1:
+			return "EMPTY_TABLE_IDLE_VAR02";
+		
+		default:
+	}
+	return "EMPTY_TABLE_IDLE_VAR01";
+}
+
+char* func_12(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return "IDLE_VAR01";
+		
+		case 1:
+			return "IDLE_VAR02";
+		
+		case 2:
+			return "IDLE_VAR03";
+		
+		case 3:
+			return "IDLE_VAR04";
+		
+		case 4:
+			return "IDLE_VAR05";
+		
+		default:
+	}
+	return "IDLE_VAR01";
+}
+
+char* func_13(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return "EMPTY_TABLE_IDLE_VAR01";
+		
+		case 1:
+			return "EMPTY_TABLE_IDLE_VAR02";
+		
+		case 2:
+			return "EMPTY_TABLE_IDLE_VAR03";
+		
+		case 3:
+			return "EMPTY_TABLE_IDLE_VAR04";
+		
+		default:
+	}
+	return "EMPTY_TABLE_IDLE_VAR01";
+}
+
+char* func_14(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return "IDLE_VAR01";
+		
+		case 1:
+			return "IDLE_VAR02";
+		
+		case 2:
+			return "IDLE_VAR03";
+		
+		case 3:
+			return "IDLE_VAR04";
+		
+		case 4:
+			return "IDLE_VAR05";
+		
+		case 5:
+			return "IDLE_VAR06";
+		
+		default:
+	}
+	return "IDLE_VAR01";
+}
+
+-- Roulette anim
+char* func_4448(int iParam0, int iParam1)
+{
+	switch (iParam0)
+	{
+		case 29:
+			return "intro_wheel";
+		
+		case 30:
+			return "loop_wheel";
+		
+		case 31:
+			return func_4450(iParam1);
+		
+		case 32:
+			return "intro_ball";
+		
+		case 33:
+			return "loop_ball";
+		
+		case 34:
+			return func_4449(iParam1);
+		
+		default:
+	}
+	return "";
+}
+
+char* func_4449(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 1:
+			return "exit_1_ball";
+		
+		case 2:
+			return "exit_2_ball";
+		
+		case 3:
+			return "exit_3_ball";
+		
+		case 4:
+			return "exit_4_ball";
+		
+		case 5:
+			return "exit_5_ball";
+		
+		case 6:
+			return "exit_6_ball";
+		
+		case 7:
+			return "exit_7_ball";
+		
+		case 8:
+			return "exit_8_ball";
+		
+		case 9:
+			return "exit_9_ball";
+		
+		case 10:
+			return "exit_10_ball";
+		
+		case 11:
+			return "exit_11_ball";
+		
+		case 12:
+			return "exit_12_ball";
+		
+		case 13:
+			return "exit_13_ball";
+		
+		case 14:
+			return "exit_14_ball";
+		
+		case 15:
+			return "exit_15_ball";
+		
+		case 16:
+			return "exit_16_ball";
+		
+		case 17:
+			return "exit_17_ball";
+		
+		case 18:
+			return "exit_18_ball";
+		
+		case 19:
+			return "exit_19_ball";
+		
+		case 20:
+			return "exit_20_ball";
+		
+		case 21:
+			return "exit_21_ball";
+		
+		case 22:
+			return "exit_22_ball";
+		
+		case 23:
+			return "exit_23_ball";
+		
+		case 24:
+			return "exit_24_ball";
+		
+		case 25:
+			return "exit_25_ball";
+		
+		case 26:
+			return "exit_26_ball";
+		
+		case 27:
+			return "exit_27_ball";
+		
+		case 28:
+			return "exit_28_ball";
+		
+		case 29:
+			return "exit_29_ball";
+		
+		case 30:
+			return "exit_30_ball";
+		
+		case 31:
+			return "exit_31_ball";
+		
+		case 32:
+			return "exit_32_ball";
+		
+		case 33:
+			return "exit_33_ball";
+		
+		case 34:
+			return "exit_34_ball";
+		
+		case 35:
+			return "exit_35_ball";
+		
+		case 36:
+			return "exit_36_ball";
+		
+		case 37:
+			return "exit_37_ball";
+		
+		case 38:
+			return "exit_38_ball";
+		
+		default:
+	}
+	return "Error";
+}
+
+char* func_4450(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 1:
+			return "exit_1_wheel";
+		
+		case 2:
+			return "exit_2_wheel";
+		
+		case 3:
+			return "exit_3_wheel";
+		
+		case 4:
+			return "exit_4_wheel";
+		
+		case 5:
+			return "exit_5_wheel";
+		
+		case 6:
+			return "exit_6_wheel";
+		
+		case 7:
+			return "exit_7_wheel";
+		
+		case 8:
+			return "exit_8_wheel";
+		
+		case 9:
+			return "exit_9_wheel";
+		
+		case 10:
+			return "exit_10_wheel";
+		
+		case 11:
+			return "exit_11_wheel";
+		
+		case 12:
+			return "exit_12_wheel";
+		
+		case 13:
+			return "exit_13_wheel";
+		
+		case 14:
+			return "exit_14_wheel";
+		
+		case 15:
+			return "exit_15_wheel";
+		
+		case 16:
+			return "exit_16_wheel";
+		
+		case 17:
+			return "exit_17_wheel";
+		
+		case 18:
+			return "exit_18_wheel";
+		
+		case 19:
+			return "exit_19_wheel";
+		
+		case 20:
+			return "exit_20_wheel";
+		
+		case 21:
+			return "exit_21_wheel";
+		
+		case 22:
+			return "exit_22_wheel";
+		
+		case 23:
+			return "exit_23_wheel";
+		
+		case 24:
+			return "exit_24_wheel";
+		
+		case 25:
+			return "exit_25_wheel";
+		
+		case 26:
+			return "exit_26_wheel";
+		
+		case 27:
+			return "exit_27_wheel";
+		
+		case 28:
+			return "exit_28_wheel";
+		
+		case 29:
+			return "exit_29_wheel";
+		
+		case 30:
+			return "exit_30_wheel";
+		
+		case 31:
+			return "exit_31_wheel";
+		
+		case 32:
+			return "exit_32_wheel";
+		
+		case 33:
+			return "exit_33_wheel";
+		
+		case 34:
+			return "exit_34_wheel";
+		
+		case 35:
+			return "exit_35_wheel";
+		
+		case 36:
+			return "exit_36_wheel";
+		
+		case 37:
+			return "exit_37_wheel";
+		
+		case 38:
+			return "exit_38_wheel";
+		
+		default:
+	}
+	return "Error";
+}
+
+Bone for roulette chairs:
+-------------------------
+char* func_4609(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return "Chair_Base_01";
+		
+		case 1:
+			return "Chair_Base_02";
+		
+		case 2:
+			return "Chair_Base_03";
+		
+		case 3:
+			return "Chair_Base_04";
+		
+		default:
+	}
+	return "";
+}
+
+
+Ped variation:
+--------------
+
+void func_4367(int iParam0, var uParam1)
+{
+	switch (iParam0)
+	{
+		case 0:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 1:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 2, 2, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 4, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 0, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 2:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 2, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 0, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 3:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 1, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 4:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 4, 2, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 5:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 4, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 6:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 4, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 4, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 1, 0, 0);
+			break;
+		
+		case 7:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 1, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 0, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			break;
+		
+		case 8:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 1, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 1, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 1, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			break;
+		
+		case 9:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 2, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			break;
+		
+		case 10:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 2, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 2, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 3, 3, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			break;
+		
+		case 11:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 3, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 0, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			PED::SET_PED_PROP_INDEX(*uParam1, 1, 0, 0, false);
+			break;
+		
+		case 12:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 3, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 3, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 1, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			break;
+		
+		case 13:
+			PED::SET_PED_DEFAULT_COMPONENT_VARIATION(*uParam1);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 0, 4, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 1, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 2, 4, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 3, 2, 1, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 4, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 6, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 7, 1, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 8, 2, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 10, 0, 0, 0);
+			PED::SET_PED_COMPONENT_VARIATION(*uParam1, 11, 0, 0, 0);
+			PED::SET_PED_PROP_INDEX(*uParam1, 1, 0, 0, false);
+			break;
+	}
+}
+
+
+Bet marker
+-------------
+-- Position
+{
+	iVar0 = uParam0->f_12;
+	iVar1 = func_4633(iParam1); -- Position
+	Var3 = { func_4506(iVar1, iVar0) };
+	Var3 = { Var3 + Vector(-0.0025f, 0f, 0f) };
+	if (iVar2 == func_4630(1))
+	{
+		fVar6 = 0.0088f;
+		Var3 = { Var3 + func_4369(fVar6, 0f, 0f, iVar0) };
+	}
+}
+
+int func_4630(bool bParam0)
+{
+	if (bParam0)
+	{
+		return MISC::GET_HASH_KEY("vw_prop_vw_marker_01a");
+	}
+	return MISC::GET_HASH_KEY("vw_prop_vw_marker_02a");
+}
+
+void func_4410(int iParam0, int iParam1, int iParam2)
+{
+	*iParam1 = (iParam0 % 8);
+	*iParam2 = (iParam0 / 8);
+}
+
+Vector3 func_4506(int iParam0, int iParam1)
+{
+	int iVar0;
+	int iVar1;
+	
+	iVar0 = 0;
+	iVar1 = 0;
+	func_4410(iParam0, &iVar0, &iVar1);
+	return func_4507(iParam1, iVar0, iVar1);
+}
+
+Vector3 func_4507(int iParam0, int iParam1, int iParam2)
+{
+	struct<3> Var0;
+	
+	Var0 = { 0f, 0f, 0f };
+	if (iParam1 >= 2)
+	{
+		Var0 = { func_4518(iParam1, iParam2) };
+	}
+	else
+	{
+		Var0 = { func_4510(iParam1, iParam2) };
+	}
+	return roulettePos + rotate(vector3(-0.097f, -0.42f, 0.947f), rouletteHeading) + rotate(Var0, rouletteHeading);
+}
+
+
+Vector3 func_4369(struct<3> Param0, int iParam3)
+{
+	return func_3452(Param0, func_18(iParam3));
+}
+
+function rotate(vec, heading)
+	return vector3(
+            (vec.x*math.cos(math.rad(heading))) - (vec.y*math.sin(math.rad(heading))),
+            (vec.x*math.sin(math.rad(heading))) + (vec.y*math.cos(math.rad(heading))),
+            vec.z
+        )
+end
+
+Vector3 func_3452(struct<3> Param0, float fParam3)
+{
+	struct<3> Var0;
+	float fVar3;
+	float fVar4;
+	
+	fVar3 = SYSTEM::SIN(fParam3);
+	fVar4 = SYSTEM::COS(fParam3);
+	Var0.x = ((Param0.x * fVar4) - (Param0.f_1 * fVar3));
+	Var0.f_1 = ((Param0.x * fVar3) + (Param0.f_1 * fVar4));
+	Var0.f_2 = Param0.f_2;
+	return Var0;
+}
+
+function func_4510(iParam0, iParam1)
+	local fVar0 = 0.0;
+	local fVar1 = 0.0;
+	local fVar2 = 0.0;
+	if iParam1 == 0 and iParam0 >= 2 then
+		fVar2 =  ((0.083013 * 3.0) * 0.5)
+	elseif iParam0 == 0 or iParam0 == 1 then
+		fVar2 =  0.074
+	else
+		fVar2 =  0.083013
+	end
+
+	local fVar3 = 0.0;
+	if iParam1 == 0 and iParam0 >= 2 and iParam0 != 3 then
+		fVar3 = 0.1
+	elseif iParam0 == 0 then
+		fVar3 = (0.081287 * 2.0)
+	elseif iParam0 == 1 then
+		fVar3 = (0.081287 * 4.0)
+	else
+		fVar3 = 0.081287
+	end
+	fVar0 = (iParam0 * fVar2)
+	fVar1 = (iParam1 * fVar3)
+	fVar0 = (fVar0 + (fVar2 * 0.5))
+	fVar1 = (fVar1 + (fVar3 * 0.5))
+	return vector3(fVar1, fVar0, 0.0)
+end
+
+function func_4518(iParam0, iParam1)
+	local fVar0 = 0.0
+	local fVar1 = 0.0
+	local fVar2 = 0.0
+	if iParam1 == 0 and iParam0 >= 2 then
+		fVar2 =  ((0.083013 * 3) * 0.5)
+	elseif iParam0 == 0 or iParam0 == 1 then
+		fVar2 =  0.074
+	else
+		fVar2 =  0.083013
+	end
+
+	local fVar3 = 0.0
+	if iParam1 == 0 and iParam0 >= 2 and iParam0 != 3 then
+		fVar3 = 0.1
+	elseif iParam0 == 0 then
+		fVar3 = (0.081287 * 2.0)
+	elseif iParam0 == 1 then
+		fVar3 = (0.081287 * 4.0)
+	else
+		fVar3 = 0.081287
+	end
+
+	local iVar4 = (iParam0 - 2)
+	fVar0 = ((iVar4 * fVar2) + (2.0 * 0.074))
+	fVar1 = (iParam1 * fVar3)
+	fVar1 = (fVar1 * 0.5)
+	if iParam1 != 25 then
+		fVar1 = (fVar1 - (fVar3 * 0.5));
+		if iParam1 == 0 then
+			fVar0 = (fVar0 + fVar2);
+		end
+	else
+		local iVar5 = (iParam0 - 3);
+		fVar0 = (fVar0 + (fVar2 * iVar5));
+	end
+	return vector3(fVar1, fVar0, 0.0);
+end

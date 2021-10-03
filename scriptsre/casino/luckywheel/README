@@ -1,0 +1,771 @@
+
+-- Player anim
+char* GetAnimDict()
+{
+	char* sVar0;
+	
+	if (IsFemalePed(PLAYER::PLAYER_PED_ID()))
+	{
+		sVar0 = "ANIM_CASINO_A@AMB@CASINO@GAMES@LUCKY7WHEEL@FEMALE";
+	}
+	else
+	{
+		sVar0 = "ANIM_CASINO_A@AMB@CASINO@GAMES@LUCKY7WHEEL@MALE";
+	}
+	return sVar0;
+}
+
+char* func_782(int iParam0)
+{
+	char* sVar0;
+	
+	switch (iParam0)
+	{
+		case 0:
+			sVar0 = "Enter_to_ArmRaisedIDLE";
+			break;
+		
+		case 1:
+			sVar0 = "ArmRaisedIDLE";
+			break;
+		
+		case 2:
+			sVar0 = "ArmRaisedIDLE_to_SpinReadyIDLE";
+			break;
+		
+		case 3:
+			sVar0 = "SpinReadyIDLE";
+			break;
+		
+		case 4:
+			sVar0 = "SpinStart_ArmRaisedIDLE_to_BaseIDLE";
+			break;
+		
+		case 5:
+			if (func_41(16))
+			{
+				sVar0 = "spinreadyidle_to_spinningidle_low";
+			}
+			else
+			{
+				sVar0 = "ArmRaisedIDLE_to_SpinningIDLE_Low";
+			}
+			break;
+		
+		case 6:
+			if (func_41(16))
+			{
+				sVar0 = "spinreadyidle_to_spinningidle_med";
+			}
+			else
+			{
+				sVar0 = "ArmRaisedIDLE_to_SpinningIDLE_Med";
+			}
+			break;
+		
+		case 7:
+			if (func_41(16))
+			{
+				sVar0 = "spinreadyidle_to_spinningidle_high";
+			}
+			else
+			{
+				sVar0 = "ArmRaisedIDLE_to_SpinningIDLE_High";
+			}
+			break;
+		
+		case 8:
+			sVar0 = "SpinningIDLE_Low";
+			break;
+		
+		case 9:
+			sVar0 = "SpinningIDLE_Medium";
+			break;
+		
+		case 10:
+			sVar0 = "SpinningIDLE_High";
+			break;
+		
+		case 11:
+			sVar0 = "Win";
+			break;
+		
+		case 12:
+			sVar0 = "Win_Big";
+			break;
+		
+		case 13:
+			sVar0 = "Win_Huge";
+			break;
+		
+		case 14:
+			sVar0 = "Exit_to_Standing";
+			break;
+		
+		case 15:
+			sVar0 = "SpinReadyIDLE_to_ArmRaisedIDLE";
+			break;
+	}
+	return sVar0;
+}
+
+
+-- Wheel position
+Vector3 func_765()
+{
+	return 1111.052f, 229.8579f, -49.133f;
+}
+
+-- Wheel creation
+void func_859()
+{
+	if (!ENTITY::DOES_ENTITY_EXIST(Local_270.f_72))
+	{
+		STREAMING::REQUEST_MODEL(func_860());
+		if (!STREAMING::HAS_MODEL_LOADED(func_860()))
+		{
+			return;
+		}
+		Local_270.f_72 = OBJECT::CREATE_OBJECT_NO_OFFSET(func_860(), func_765(), false, false, true);
+		ENTITY::_SET_ENTITY_CLEANUP_BY_ENGINE(Local_270.f_72, true);
+		ENTITY::SET_ENTITY_CAN_BE_DAMAGED(Local_270.f_72, false);
+	}
+}
+
+int func_860()
+{
+	return joaat("vw_prop_vw_luckywheel_02a");
+}
+
+
+-- Start wheel animation
+void func_155()
+{
+	char* sVar0;
+	
+	sVar0 = func_156(func_799(Local_107));
+	ENTITY::SET_ENTITY_ROTATION(Local_270.f_72, 0f, 0f, 0f, 2, true);
+	ENTITY::PLAY_ENTITY_ANIM(Local_270.f_72, sVar0, Local_270.f_23, 1000f, false, true, false, 0f, 2);
+	ENTITY::FORCE_ENTITY_AI_AND_ANIMATION_UPDATE(Local_270.f_72);
+}
+
+-- Wheel animation
+char* func_156(int iParam0)
+{
+	char* sVar0;
+	
+	sVar0 = "null";
+	switch (iParam0)
+	{
+		case 0:
+			if (IsFemalePed(PLAYER::PLAYER_PED_ID()))
+			{
+				switch (Local_270.f_10)
+				{
+					case 0:
+						return "spinningwheel_low_effort_01_wheel";
+						break;
+					
+					case 1:
+						return "spinningwheel_low_effort_02_wheel";
+						break;
+					
+					case 2:
+						return "spinningwheel_low_effort_03_wheel";
+						break;
+					
+					case 3:
+						return "spinningwheel_low_effort_04_wheel";
+						break;
+					
+					case 4:
+						return "spinningwheel_low_effort_05_wheel";
+						break;
+					
+					case 5:
+						return "spinningwheel_low_effort_06_wheel";
+						break;
+					
+					case 6:
+						return "spinningwheel_low_effort_07_wheel";
+						break;
+					
+					case 7:
+						return "spinningwheel_low_effort_08_wheel";
+						break;
+					
+					case 8:
+						return "spinningwheel_low_effort_09_wheel";
+						break;
+					
+					case 9:
+						return "spinningwheel_low_effort_10_wheel";
+						break;
+					
+					case 10:
+						return "spinningwheel_low_effort_11_wheel";
+						break;
+					
+					case 11:
+						return "spinningwheel_low_effort_12_wheel";
+						break;
+					
+					case 12:
+						return "spinningwheel_low_effort_13_wheel";
+						break;
+					
+					case 13:
+						return "spinningwheel_low_effort_14_wheel";
+						break;
+					
+					case 14:
+						return "spinningwheel_low_effort_15_wheel";
+						break;
+					
+					case 15:
+						return "spinningwheel_low_effort_16_wheel";
+						break;
+					
+					case 16:
+						return "spinningwheel_low_effort_17_wheel";
+						break;
+					
+					case 17:
+						return "spinningwheel_low_effort_18_wheel";
+						break;
+					
+					case 18:
+						return "spinningwheel_low_effort_19_wheel";
+						break;
+					
+					case 19:
+						return "spinningwheel_low_effort_20_wheel";
+						break;
+				}
+			}
+			else
+			{
+				switch (Local_270.f_10)
+				{
+					case 0:
+						return "spinningwheel_low_effort_01";
+						break;
+					
+					case 1:
+						return "spinningwheel_low_effort_02";
+						break;
+					
+					case 2:
+						return "spinningwheel_low_effort_03";
+						break;
+					
+					case 3:
+						return "spinningwheel_low_effort_04";
+						break;
+					
+					case 4:
+						return "spinningwheel_low_effort_05";
+						break;
+					
+					case 5:
+						return "spinningwheel_low_effort_06";
+						break;
+					
+					case 6:
+						return "spinningwheel_low_effort_07";
+						break;
+					
+					case 7:
+						return "spinningwheel_low_effort_08";
+						break;
+					
+					case 8:
+						return "spinningwheel_low_effort_09";
+						break;
+					
+					case 9:
+						return "spinningwheel_low_effort_10";
+						break;
+					
+					case 10:
+						return "spinningwheel_low_effort_11";
+						break;
+					
+					case 11:
+						return "spinningwheel_low_effort_12";
+						break;
+					
+					case 12:
+						return "spinningwheel_low_effort_13";
+						break;
+					
+					case 13:
+						return "spinningwheel_low_effort_14";
+						break;
+					
+					case 14:
+						return "spinningwheel_low_effort_15";
+						break;
+					
+					case 15:
+						return "spinningwheel_low_effort_16";
+						break;
+					
+					case 16:
+						return "spinningwheel_low_effort_17";
+						break;
+					
+					case 17:
+						return "spinningwheel_low_effort_18";
+						break;
+					
+					case 18:
+						return "spinningwheel_low_effort_19";
+						break;
+					
+					case 19:
+						return "spinningwheel_low_effort_20";
+						break;
+					}
+			}
+			break;
+		
+		case 1:
+			if (IsFemalePed(PLAYER::PLAYER_PED_ID()))
+			{
+				switch (Local_270.f_10)
+				{
+					case 0:
+						return "spinningwheel_med_effort_20_wheel";
+						break;
+					
+					case 1:
+						return "spinningwheel_med_effort_01_wheel";
+						break;
+					
+					case 2:
+						return "spinningwheel_med_effort_02_wheel";
+						break;
+					
+					case 3:
+						return "spinningwheel_med_effort_03_wheel";
+						break;
+					
+					case 4:
+						return "spinningwheel_med_effort_04_wheel";
+						break;
+					
+					case 5:
+						return "spinningwheel_med_effort_05_wheel";
+						break;
+					
+					case 6:
+						return "spinningwheel_med_effort_06_wheel";
+						break;
+					
+					case 7:
+						return "spinningwheel_med_effort_07_wheel";
+						break;
+					
+					case 8:
+						return "spinningwheel_med_effort_08_wheel";
+						break;
+					
+					case 9:
+						return "spinningwheel_med_effort_09_wheel";
+						break;
+					
+					case 10:
+						return "spinningwheel_med_effort_10_wheel";
+						break;
+					
+					case 11:
+						return "spinningwheel_med_effort_11_wheel";
+						break;
+					
+					case 12:
+						return "spinningwheel_med_effort_12_wheel";
+						break;
+					
+					case 13:
+						return "spinningwheel_med_effort_13_wheel";
+						break;
+					
+					case 14:
+						return "spinningwheel_med_effort_14_wheel";
+						break;
+					
+					case 15:
+						return "spinningwheel_med_effort_15_wheel";
+						break;
+					
+					case 16:
+						return "spinningwheel_med_effort_16_wheel";
+						break;
+					
+					case 17:
+						return "spinningwheel_med_effort_17_wheel";
+						break;
+					
+					case 18:
+						return "spinningwheel_med_effort_18_wheel";
+						break;
+					
+					case 19:
+						return "spinningwheel_med_effort_19_wheel";
+						break;
+				}
+			}
+			else
+			{
+				switch (Local_270.f_10)
+				{
+					case 0:
+						return "spinningwheel_med_effort_01";
+						break;
+					
+					case 1:
+						return "spinningwheel_med_effort_02";
+						break;
+					
+					case 2:
+						return "spinningwheel_med_effort_03";
+						break;
+					
+					case 3:
+						return "spinningwheel_med_effort_04";
+						break;
+					
+					case 4:
+						return "spinningwheel_med_effort_05";
+						break;
+					
+					case 5:
+						return "spinningwheel_med_effort_06";
+						break;
+					
+					case 6:
+						return "spinningwheel_med_effort_07";
+						break;
+					
+					case 7:
+						return "spinningwheel_med_effort_08";
+						break;
+					
+					case 8:
+						return "spinningwheel_med_effort_09";
+						break;
+					
+					case 9:
+						return "spinningwheel_med_effort_10";
+						break;
+					
+					case 10:
+						return "spinningwheel_med_effort_11";
+						break;
+					
+					case 11:
+						return "spinningwheel_med_effort_12";
+						break;
+					
+					case 12:
+						return "spinningwheel_med_effort_13";
+						break;
+					
+					case 13:
+						return "spinningwheel_med_effort_14";
+						break;
+					
+					case 14:
+						return "spinningwheel_med_effort_15";
+						break;
+					
+					case 15:
+						return "spinningwheel_med_effort_16";
+						break;
+					
+					case 16:
+						return "spinningwheel_med_effort_17";
+						break;
+					
+					case 17:
+						return "spinningwheel_med_effort_18";
+						break;
+					
+					case 18:
+						return "spinningwheel_med_effort_19";
+						break;
+					
+					case 19:
+						return "spinningwheel_med_effort_20";
+						break;
+					}
+			}
+			break;
+		
+		case 2:
+			if (IsFemalePed(PLAYER::PLAYER_PED_ID()))
+			{
+				switch (Local_270.f_10)
+				{
+					case 0:
+						return "spinningwheel_high_effort_01_wheel";
+						break;
+					
+					case 1:
+						return "spinningwheel_high_effort_02_wheel";
+						break;
+					
+					case 2:
+						return "spinningwheel_high_effort_03_wheel";
+						break;
+					
+					case 3:
+						return "spinningwheel_high_effort_04_wheel";
+						break;
+					
+					case 4:
+						return "spinningwheel_high_effort_05_wheel";
+						break;
+					
+					case 5:
+						return "spinningwheel_high_effort_06_wheel";
+						break;
+					
+					case 6:
+						return "spinningwheel_high_effort_07_wheel";
+						break;
+					
+					case 7:
+						return "spinningwheel_high_effort_08_wheel";
+						break;
+					
+					case 8:
+						return "spinningwheel_high_effort_09_wheel";
+						break;
+					
+					case 9:
+						return "spinningwheel_high_effort_10_wheel";
+						break;
+					
+					case 10:
+						return "spinningwheel_high_effort_11_wheel";
+						break;
+					
+					case 11:
+						return "spinningwheel_high_effort_12_wheel";
+						break;
+					
+					case 12:
+						return "spinningwheel_high_effort_13_wheel";
+						break;
+					
+					case 13:
+						return "spinningwheel_high_effort_14_wheel";
+						break;
+					
+					case 14:
+						return "spinningwheel_high_effort_15_wheel";
+						break;
+					
+					case 15:
+						return "spinningwheel_high_effort_16_wheel";
+						break;
+					
+					case 16:
+						return "spinningwheel_high_effort_17_wheel";
+						break;
+					
+					case 17:
+						return "spinningwheel_high_effort_18_wheel";
+						break;
+					
+					case 18:
+						return "spinningwheel_high_effort_19_wheel";
+						break;
+					
+					case 19:
+						return "spinningwheel_high_effort_20_wheel";
+						break;
+				}
+			}
+			else
+			{
+				switch (Local_270.f_10)
+				{
+					case 0:
+						return "spinningwheel_high_effort_01";
+						break;
+					
+					case 1:
+						return "spinningwheel_high_effort_02";
+						break;
+					
+					case 2:
+						return "spinningwheel_high_effort_03";
+						break;
+					
+					case 3:
+						return "spinningwheel_high_effort_04";
+						break;
+					
+					case 4:
+						return "spinningwheel_high_effort_05";
+						break;
+					
+					case 5:
+						return "spinningwheel_high_effort_06";
+						break;
+					
+					case 6:
+						return "spinningwheel_high_effort_07";
+						break;
+					
+					case 7:
+						return "spinningwheel_high_effort_08";
+						break;
+					
+					case 8:
+						return "spinningwheel_high_effort_09";
+						break;
+					
+					case 9:
+						return "spinningwheel_high_effort_10";
+						break;
+					
+					case 10:
+						return "spinningwheel_high_effort_11";
+						break;
+					
+					case 11:
+						return "spinningwheel_high_effort_12";
+						break;
+					
+					case 12:
+						return "spinningwheel_high_effort_13";
+						break;
+					
+					case 13:
+						return "spinningwheel_high_effort_14";
+						break;
+					
+					case 14:
+						return "spinningwheel_high_effort_15";
+						break;
+					
+					case 15:
+						return "spinningwheel_high_effort_16";
+						break;
+					
+					case 16:
+						return "spinningwheel_high_effort_17";
+						break;
+					
+					case 17:
+						return "spinningwheel_high_effort_18";
+						break;
+					
+					case 18:
+						return "spinningwheel_high_effort_19";
+						break;
+					
+					case 19:
+						return "spinningwheel_high_effort_20";
+						break;
+					}
+			}
+			break;
+	}
+	return sVar0;
+}
+
+
+
+ENTITY::SET_ENTITY_ROTATION(Local_270.f_72, 0f, -func_835(Local_107.f_1), 0f, 2, true);
+
+float func_835(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return 0f;
+			break;
+		
+		case 1:
+			return 18f;
+			break;
+		
+		case 2:
+			return 36f;
+			break;
+		
+		case 3:
+			return 54f;
+			break;
+		
+		case 4:
+			return 72f;
+			break;
+		
+		case 5:
+			return 90f;
+			break;
+		
+		case 6:
+			return 108f;
+			break;
+		
+		case 7:
+			return 126f;
+			break;
+		
+		case 8:
+			return 144f;
+			break;
+		
+		case 9:
+			return 162f;
+			break;
+		
+		case 10:
+			return 180f;
+			break;
+		
+		case 11:
+			return 198f;
+			break;
+		
+		case 12:
+			return 216f;
+			break;
+		
+		case 13:
+			return 234f;
+			break;
+		
+		case 14:
+			return 252f;
+			break;
+		
+		case 15:
+			return 270f;
+			break;
+		
+		case 16:
+			return 288f;
+			break;
+		
+		case 17:
+			return 306f;
+			break;
+		
+		case 18:
+			return 324f;
+			break;
+		
+		case 19:
+			return 342f;
+			break;
+	}
+	return 0f;
+}
