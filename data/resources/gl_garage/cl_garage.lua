@@ -11,11 +11,6 @@ RegisterCommand('svspawn', function(source, args, rawCommand)
     local forward, right, up, pos = GetEntityMatrix(ped)
     local head = GetEntityHeading(ped)
 
-    --pos = pos + forward*5
-
-    print(vehicleName)
-    print(pos)
-    print(head)
     TriggerServerEvent('gl_garage:spawn', vehicleName, pos.x, pos.y, pos.z, head)
 
 end, false)
