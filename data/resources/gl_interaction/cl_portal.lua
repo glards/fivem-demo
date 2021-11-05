@@ -50,13 +50,17 @@ Citizen.CreateThread(function()
         local ped = PlayerPedId()
         local coords = GetEntityCoords(ped)
 
+        local controlPressed = IsControlJustPressed(0, 38)
+
         for i=1,#Portals do
             local portal = Portals[i]
-            DrawMarker(23, portal.Pos.x, portal.Pos.y, portal.Pos.z, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 255, 255, 255, 255, false, true, 2, nil, nil, false)
-
             local dist = #(coords - portal.Pos.xyz)
 
-            if dist < 1.5 and IsControlJustPressed(0, 38) then
+            if dist < 10.0 then
+                DrawMarker(23, portal.Pos.x, portal.Pos.y, portal.Pos.z + 0.01, 0.0, 0.0, 0.0, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, 255, 255, 255, 255, false, true, 2, nil, nil, false)
+            end
+
+            if dist < 1.5 and controlPressed then
                 local otherPortal = findPortalByName(portal.LinkTo)
                 if otherPortal ~= nil then
                     DoScreenFadeOut(500)
