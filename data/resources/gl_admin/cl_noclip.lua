@@ -59,7 +59,7 @@ function NoClip()
     FreezeEntityPosition(ped, false)
     SetEntityCollision(ped, true, true)
 
-    while not IsPedStopped(ped) or IsPedFalling(ped) do
+    while IsPedFalling(ped) do
         Citizen.Wait(0);
     end
     
