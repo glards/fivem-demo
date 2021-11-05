@@ -70,13 +70,16 @@ function ClientThread()
                         lastEntity = ""
                         
                         if entityHit ~= 0 then
-                            lastEntity = ""
+                            lastEntity = "" .. entityHit
                             local entityType = GetEntityType(entityHit)
                             if entityType == 1 then
-                                lastEntity = lastEntity .. "Ped " .. entityHit
+                                lastEntity = lastEntity .. " Ped " .. entityHit
                             elseif entityType == 2 then
                                 local plate = GetVehicleNumberPlateText(entityHit)
-                                lastEntity = lastEntity .. "Vehicle " .. plate
+                                lastEntity = lastEntity .. " Vehicle " .. plate
+                            elseif entityType == 3 then
+                                local hash = GetEntityModel(entityHit)
+                                lastEntity = lastEntity .. " Object " .. hash
                             end
                         end
                     else
@@ -101,6 +104,14 @@ function ClientThread()
     end
 end
 Citizen.CreateThread(ClientThread)
+
+Citizen.CreateThread(function()
+	while true do
+		InvalidateIdleCam()
+		InvalidateVehicleIdleCam()
+		Wait(1000)
+	end
+end)
 
 AddEventHandler('onResourceStart', function(resource)
     if resource == GetCurrentResourceName() then
