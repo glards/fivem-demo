@@ -27,15 +27,6 @@ local markerProp = {
 
 local rouletteBallProp = `vw_prop_roulette_ball`
 
-local roulette = {}
-function roulette:new()
-    local obj = {}
-    setmetatable(obj, self)
-    self.__index = self
-
-    return obj
-end
-
 function createRoulette()
     local roulette = {}
 
@@ -45,6 +36,9 @@ function createRoulette()
         local o = {}
         setmetatable(o, roulette)
         return o
+    end
+
+    function roulette:tick()
     end
 
     return roulette

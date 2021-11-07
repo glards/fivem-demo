@@ -42,3 +42,9 @@ RegisterNetEvent('gl_casino:playerLeaveCasino', playerLeaveCasino)
 RegisterCommand('setWheel', function(source, args, rawCommand)
     wheelPos = tonumber(args[1]) or 1
 end, false)
+
+function BroadcastCasinoEvent(event, ...)
+    for k,v in pairs(casinoPeds) do
+        TriggerClientEvent(event, v, ...)
+    end
+end

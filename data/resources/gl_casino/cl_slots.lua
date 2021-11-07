@@ -215,6 +215,14 @@ animDicts = {
     "anim_casino_a@amb@casino@games@slots@male"
 }
 
+local function getAnimDict(ped)
+    local dict = 1
+    if IsPedMale(ped) then
+        dict = 2
+    end
+    return animDicts[dict]
+end
+
 SlotMachine = { }
 
 function SlotMachine:new(id, pos, seatPos, type, reelHash)
@@ -236,7 +244,9 @@ function SlotMachine:new(id, pos, seatPos, type, reelHash)
             pos = reelPos,
             heading = o.pos.w,
             angle = 0.0,
-            nextAnim = 0
+            nextAnim = 0,
+            endPos = nil,
+            spinning = false
         }
         table.insert(o.reels, reel)
     end
@@ -262,22 +272,78 @@ function SlotMachine:createObjects()
     self.objectCreated = true
 end
 
-function SlotMachine:animate(gameTimer)
-    local DELAY = 100
-    local SPEED = 12.0
+function SlotMachine:startSpinning()
+    self.fixing = 1
+    for i, reel in pairs(self.reels) do
+        reel.endPos = nil
+        reel.spinning = true
+    end
+end
 
-    for _, reel in pairs(self.reels) do
-        local animated = false
-        if gameTimer > reel.nextAnim then
-            reel.angle = reel.angle + SPEED
-            if reel.angle > 360.0 then
-                reel.angle = reel.angle - 360.0
-            end 
+function SlotMachine:stopSpinning(reel1, reel2, reel3)
+    self.reels[1].endPos = reel1
+    self.reels[2].endPos = reel2
+    self.reels[3].endPos = reel3
+
+    self.fixing = 1
+
+    print("StopSpinning", self.id, reel1, reel2, reel3)
+end
+
+function clamp(v, min, max)
+    local d = max - min
+
+    while v < min do
+        v = v + d
+    end
+
+    while v > max do
+        v = v - d
+    end
+
+    return v
+end
+
+-- 0.0, 1.0 -> 1.0
+-- 359.0, 0.0  -> 1.0
+-- 0.0, 359.0 -> 1.0
+-- 1.0, 0.0 -> 1.0
+function dist(a, b, min, max)
+    local d = max - min
+
+    return math.min(
+            math.min(
+                math.abs((b + d) - a),
+                math.abs(b - a)
+            ),
+            math.abs(b - (a + d))
+           )
+end
+
+function SlotMachine:animate(gameTimer)
+    local DELAY = 16
+    local SPEED = 5.0
+    local POS_ANGLE = 22.5
+    
+    for i, reel in pairs(self.reels) do
+        if gameTimer > reel.nextAnim and reel.spinning then
+            local nextAngle = clamp(reel.angle + SPEED, 0.0, 360.0)
+
+            if reel.endPos and self.fixing == i then
+                local reelAngle = reel.endPos * POS_ANGLE
+                if dist(reelAngle, nextAngle, 0.0, 360.0) < 6.0 then
+                    local offset = (math.random()-0.5)*6.0
+                    nextAngle = reelAngle + offset
+                    self.fixing = self.fixing + 1
+                    reel.spinning = false
+                end
+            end
+
+            reel.angle = nextAngle
             reel.nextAnim = gameTimer + DELAY
-            animated = true
         end
 
-        if self.objectCreated and animated then
+        if self.objectCreated then
             SetEntityRotation(reel.object, reel.angle, 0.0, reel.heading, 2, true)
         end
     end
@@ -305,32 +371,8 @@ function SlotMachine:tick(playerPed, playerPos, gameTimer)
     self:animate(gameTimer)
 end
 
-function loadModels(models)
-    for i=1,#models do
-        local hash = models[i]
-        if hash ~= nil then
-            RequestModel(hash)
-            while not HasModelLoaded(hash) do
-                Citizen.Wait(0)
-            end
-        end
-    end
-end
-
-function loadAnimDicts(dicts)
-    for i=1,#dicts do
-        local dict = dicts[i]
-        if dict ~= nil then            
-            RequestAnimDict(dict)
-            while not HasAnimDictLoaded(dict) do
-                Citizen.Wait(0)
-            end
-        end
-    end
-end
-
 local slotMachineInstances = {}
-local running = true
+local running = false
 local INPUT_ENTER = 23
 local INPUT_CONTEXT = 51
 local INPUT_CONTEXT_SECONDARY = 52
@@ -338,19 +380,19 @@ local INPUT_CONTEXT_SECONDARY = 52
 local currentState = nil
 local usedSlotmachine = nil
 
-Citizen.CreateThread(function ()
-    loadModels(machinesSlotReelHashes)
-    loadModels(machinesSlotWheelHashes)
-    loadAnimDicts(animDicts)
+local function streamAssets()
+    exports.gl_utils:loadModels(machinesSlotReelHashes)
+    exports.gl_utils:loadModels(machinesSlotWheelHashes)
+    exports.gl_utils:loadAnimDicts(animDicts)
     RequestScriptAudioBank("dlc_vinewood\\casino_general")
     RequestScriptAudioBank("dlc_vinewood\\casino_interior_stems")
     RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_01")
     RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_02")
     RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_03")
-end)
+end
 
 -- Player thread controls the state of the client playing slot machine
-Citizen.CreateThread(function ()
+local function playerThread()
     local ped = PlayerPedId()
     
     --StartAudioScene("dlc_vw_casino_slot_machines_playing")
@@ -360,17 +402,17 @@ Citizen.CreateThread(function ()
     while running do
         Citizen.Wait(0)
 
-        local gameTimer = GetGameTimer()
+        local timer = GetGameTimer()
         local coords = GetEntityCoords(ped)
 
         if currentState then
-            currentState(ped, coords, gameTimer)
+            currentState(ped, coords, timer)
         end
     end
-end)
+end
 
 -- Slot machine thread controls the state of the slot machines in the casino
-Citizen.CreateThread(function ()
+local function slotMachineThread()
     local ped = PlayerPedId()
 
     for i=1,#slotMachines do
@@ -396,10 +438,6 @@ Citizen.CreateThread(function ()
             slotMachine:tick(ped, coords, timer)
         end
     end
-end)
-
-function Slots_OutsideCasino(ped, coords, timer)
-
 end
 
 function Slots_InsideCasino(ped, coords, timer)
@@ -417,7 +455,7 @@ function Slots_InsideCasino(ped, coords, timer)
     end
 
     if closestSlotMachine then
-        drawNotification(string.format("Appuyer sur ~INPUT_ENTER~ pour jouer sur la machine %04d", closestSlotMachine.id))
+        exports.gl_utils:drawNotification(string.format("Appuyer sur ~INPUT_ENTER~ pour jouer sur la machine %04d", closestSlotMachine.id))
     end
 
     local controlPressed = IsControlJustPressed(0, INPUT_ENTER)
@@ -426,109 +464,6 @@ function Slots_InsideCasino(ped, coords, timer)
         usedSlotmachine.occupied = true
         currentState = Slots_WalkAndSit
     end
-end
-
-function followNavMesh(ped, dest, heading)
-    local p = promise.new()
-
-    TaskFollowNavMeshToCoord(ped, dest, 1.0, 7000, 0.05, false, heading)
-
-    Citizen.CreateThread(function ()
-        repeat
-            Citizen.Wait(0)
-        until #(GetEntityCoords(ped).xy - dest.xy) <= 0.25
-        Citizen.Wait(500)
-        p:resolve()
-    end)
-
-    return p
-end
-
-function playAnim(ped, animDict, anim)
-    local p = promise.new()
-
-    local duration = GetAnimDuration(animDict, anim)
-
-    --ClearPedTasksImmediately(ped)
-    TaskPlayAnim(ped, animDict, anim, 8.0, 8.0, -1, 0, 0.0, 1.0, 0.0, 1.0)
-
-    Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
-        p:resolve()
-    end)
-
-    return p
-end
-
-function playAnimWithPos(ped, animDict, anim, pos, rot)
-    local p = promise.new()
-
-    local duration = GetAnimDuration(animDict, anim)
-
-    TaskPlayAnimAdvanced(ped, animDict, anim, pos, rot, 8.0, 8.0, -1, 0, 0.0, 1.0, 0.0, 1.0)
-
-    Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
-        p:resolve()
-    end)
-
-    return p
-end
-
-
-function playNetworkSynchronizedScene(ped, animDict, anim, pos, rot, holdLastFrame, looped, blendInSpeed, blendOutSpeed, duration, flag, playbackRate)
-    local p = promise.new()
-
-    local sceneId = NetworkCreateSynchronisedScene(pos, rot, 2, holdLastFrame, looped, 1.0, 0.0, 1.0)
-    NetworkAddPedToSynchronisedScene(ped, sceneId, animDict, anim, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, 0)
-
-    NetworkStartSynchronisedScene(sceneId)
-
-    local duration = GetAnimDuration(animDict, anim)
-
-    Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
-        p:resolve()
-    end)
-
-    return p
-end
-
-function playNetworkSynchronizedSceneWithObject(ped, objectHash, objectAnim, animDict, anim, pos, rot, holdLastFrame, looped, blendInSpeed, blendOutSpeed, duration, flag, playbackRate)
-    local p = promise.new()
-
-    local sceneId = NetworkCreateSynchronisedScene(pos, rot, 2, holdLastFrame, looped, 1.0, 0.0, 1.0)
-    NetworkAddPedToSynchronisedScene(ped, sceneId, animDict, anim, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, 0)
-
-    Citizen.InvokeNative(0x45F35C0EDC33B03B, sceneId, objectHash, pos, animDict, objectAnim, 2.0, -1.5, 13)
-
-    NetworkStartSynchronisedScene(sceneId)
-
-    local duration = GetAnimDuration(animDict, anim)
-
-    Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
-        p:resolve()
-    end)
-
-    return p
-end
-
-function playSynchronizedScene(ped, animDict, anim, pos, rot, holdLastFrame, looped, blendInSpeed, blendOutSpeed, duration, flag, playbackRate)
-    local p = promise.new()
-
-    local sceneId = CreateSynchronizedScene(pos, rot, 2, holdLastFrame, looped, 1.0, 0.0, 1.0)
-
-    TaskSynchronizedScene(ped, sceneId, animDict, anim, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, 0)
-
-    Citizen.CreateThread(function ()
-        repeat
-            Citizen.Wait(0)
-        until GetSynchronizedScenePhase(sceneId) >= 0.99
-        p:resolve()
-    end)
-
-    return p
 end
 
 function Slots_WalkAndSit(ped, coords, timer)
@@ -540,9 +475,9 @@ function Slots_WalkAndSit(ped, coords, timer)
     local animPos = GetAnimInitialOffsetPosition(animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, 0.01, 2)
     local animRot = GetAnimInitialOffsetRotation(animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, 0.01, 2)
 
-    Citizen.Await(followNavMesh(ped, animPos, animRot.z))
+    Citizen.Await(exports.gl_utils:followNavMesh(ped, animPos, animRot.z))
 
-    Citizen.Await(playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 2.0))
+    Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 2.0))
 
     currentState = Slots_Idle
 end
@@ -556,8 +491,13 @@ local slotControls = {
 function startIdleAnimLoop(ped)
     local animDict = getAnimDict(ped)
     local anim = anims[math.random(5,9)]
+
+    if not usedSlotmachine then
+        return nil
+    end
+
     local machineRot = vector3(0.0, 0.0, usedSlotmachine.pos.w)
-    local p = playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0)
+    local p = exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0)
 
     p:next(function (v)
         if currentState ~= Slots_Idle then
@@ -589,7 +529,7 @@ function Slots_Idle(ped, coords, timer)
         return
     end
 
-    drawInstructionalButtons(slotControls)
+    exports.gl_utils:drawInstructionalButtons(slotControls)
 end
 
 function Slots_Play(ped, coords, timer)
@@ -598,14 +538,15 @@ function Slots_Play(ped, coords, timer)
 
     local objectHash = machinesObjectHashes[usedSlotmachine.type]
     local objectAnim = anim[1] .. "_SLOTMACHINE"
-    
+
+    TriggerServerEvent('gl_casino:sv:slots', usedSlotmachine.id, 'play')
+
     local machineRot = vector3(0.0, 0.0, usedSlotmachine.pos.w)
-    Citizen.Await(playNetworkSynchronizedSceneWithObject(ped, objectHash, objectAnim, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
+    Citizen.Await(exports.gl_utils:playNetworkSynchronizedSceneWithObject(ped, objectHash, objectAnim, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
 
     anim = anims[math.random(21, 23)]
-    Citizen.Await(playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
+    Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
 
-    currentState = Slots_Idle
 end
 
 function Slots_AnimExit(ped, coords, timer)
@@ -613,7 +554,7 @@ function Slots_AnimExit(ped, coords, timer)
     local anim = anims[math.random(31,32)]
 
     local machineRot = vector3(0.0, 0.0, usedSlotmachine.pos.w)
-    Citizen.Await(playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
+    Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
 
     ClearPedTasksImmediately(ped)
 
@@ -623,14 +564,29 @@ function Slots_AnimExit(ped, coords, timer)
     currentState = Slots_InsideCasino
 end
 
-AddEventHandler('onResourceStop', function(resource)
-    if resource == GetCurrentResourceName() then
-        running = false
-        for _, slotMachine in pairs(slotMachineInstances) do
-            slotMachine:destroyObjects()
-        end
+function startSlotMachines()
+    if running then
+        return
     end
-end)
+
+    running = true
+
+    streamAssets()
+    Citizen.CreateThread(playerThread)
+    Citizen.CreateThread(slotMachineThread)
+end
+
+function stopSlotMachines()
+    if not running then
+        return
+    end
+
+    running = false
+
+    for _, slotMachine in pairs(slotMachineInstances) do
+        slotMachine:destroyObjects()
+    end
+end
 
 anims = {
     { "enter_left", true, false },       -- 1 
@@ -699,20 +655,20 @@ soundsRef = {
 }
 
 sounds = {
-    "no_win",
-    "small_win",
-    "big_win",
-    "jackpot",
-    "place_bet",
-    "place_max_bet",
-    "spinning",
-    "start_spin",
-    "wheel_stop_clunk",
-    "wheel_stop_on_prize",
-    "welcome_stinger",
-    "spin_wheel",
-    "spin_wheel_win",
-    "attract_loop"
+    "no_win",               -- 1
+    "small_win",            -- 2
+    "big_win",              -- 3
+    "jackpot",              -- 4
+    "place_bet",            -- 5
+    "place_max_bet",        -- 6
+    "spinning",             -- 7
+    "start_spin",           -- 8
+    "wheel_stop_clunk",     -- 9
+    "wheel_stop_on_prize",  -- 10
+    "welcome_stinger",      -- 11
+    "spin_wheel",           -- 12
+    "spin_wheel_win",       -- 13
+    "attract_loop"          -- 14
 }
 
 RegisterCommand('slotSound', function(source, args, rawCommand)
@@ -732,58 +688,48 @@ RegisterCommand('slotSound', function(source, args, rawCommand)
     PlaySoundFromEntity(-1, sounds[num], ped, soundsRef[ref], false, 0)
 end, false)
 
-function drawNotification(text)
-    SetTextComponentFormat('STRING')
-    AddTextComponentString(text)
-    EndTextCommandDisplayHelp(0, 0, 0, -1)
+
+RegisterCommand('reelIndex', function(source, args, rawCommand)
+    local idx = tonumber(args[1])
+
+    if idx > 15 then
+        return
+    end
+
+    reelIndex = idx
+end, false)
+
+RegisterNetEvent('gl_casino:cl:slots', function (id, event, arg1, arg2, arg3)
+    print("Event", id, event)
+
+    if event == 'startSpinning' then
+        slotsStartSpinning(id)
+    elseif event == 'stopSpinning' then
+        slotsStopSpinning(id, arg1, arg2, arg3)
+    elseif event == 'reset' then
+        slotsReset()
+    end
+end)
+
+function slotsReset()
+    local ped = PlayerPedId()
+    ClearPedTasksImmediately(ped)
+    currentState = Slots_InsideCasino
 end
 
-function drawInstructionalButtons(data)
-    local scaleform = RequestScaleformMovie("instructional_buttons")
-    while not HasScaleformMovieLoaded(scaleform) do
-        Citizen.Wait(0)
+function slotsStartSpinning(id)
+    if id > #slotMachineInstances or id < 1 then
+        return
     end
-    
-    DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 0, 0)
-    
-    PushScaleformMovieFunction(scaleform, "CLEAR_ALL")
-    PopScaleformMovieFunctionVoid()
-
-    PushScaleformMovieFunction(scaleform, "SET_CLEAR_SPACE")
-    PushScaleformMovieFunctionParameterInt(200)
-    PopScaleformMovieFunctionVoid()
-
-    for n, btn in next, data do
-        PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
-        PushScaleformMovieFunctionParameterInt(n-1)
-
-        ScaleformMovieMethodAddParamPlayerNameString(GetControlInstructionalButton(2, btn.control, true))
-
-        BeginTextCommandScaleformString("STRING")
-        AddTextComponentScaleform(btn.name)
-        EndTextCommandScaleformString()
-
-
-        PopScaleformMovieFunctionVoid()
-    end
-
-    PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
-    PopScaleformMovieFunctionVoid()
-
-    PushScaleformMovieFunction(scaleform, "SET_BACKGROUND_COLOUR")
-    PushScaleformMovieFunctionParameterInt(0)
-    PushScaleformMovieFunctionParameterInt(0)
-    PushScaleformMovieFunctionParameterInt(0)
-    PushScaleformMovieFunctionParameterInt(80)
-    PopScaleformMovieFunctionVoid()
-
-    return scaleform
+    local slotMachine = slotMachineInstances[id]
+    slotMachine:startSpinning()
 end
 
-function getAnimDict(ped)
-    local dict = 1
-    if IsPedMale(ped) then
-        dict = 2
+function slotsStopSpinning(id, reel1, reel2, reel3)
+    if id > #slotMachineInstances or id < 1 then
+        return
     end
-    return animDicts[dict]
+    local slotMachine = slotMachineInstances[id]
+    slotMachine:stopSpinning(reel1, reel2, reel3)
+    currentState = Slots_Idle
 end
