@@ -1,0 +1,72 @@
+
+
+
+See http://edspi31415.blogspot.com/2014/01/probability-odds-of-winning-at-slot.html
+Slots win table :
+
+0	F
+1	C
+2	B
+3	D
+4	A
+5	G
+6	B
+7	E
+8	F
+9	C
+10	D
+11	A
+12	C
+13	E
+14	B
+15	A
+
+Symbols frequency
+A	3
+B	3
+C	3
+D	2
+E	2
+F	2
+G	1
+Total 16
+
+Total combination 16*16*16=4096
+
+A  		3*13*13 + 13*3*13 + 13*13*3 = 1521
+AA		3*3*13 + 3*13*3 + 13*3*3 = 351
+AAA		3*3*3 = 27
+BBB		3*3*3 = 27
+CCC		3*3*3 = 27
+DDD		2*2*2 = 8
+EEE		2*2*2 = 8
+FFF		2*2*2 = 8
+GGG		1*1*1 = 1
+Winning combination 1978
+
+
+10 - 50 - 200 - 1000
+1x - 5x - 20x - 100x
+FS:
+
+A = 10
+AA = 25
+AAA = 2500
+B = 125
+C = 250
+D = 375
+E = 500
+F = 1250
+G = 5000
+
+RSR: 
+
+A = 50
+AA = 125
+AAA = 12500
+B = 625
+C = 1250
+D = 1875
+E = 2500
+F = 6250
+G = 25000

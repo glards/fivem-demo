@@ -189,29 +189,6 @@ function LuckyWheel_InsideCasino(ped, coords, timer)
     end
 end
 
-function joinPromise(promise1, promise2)
-    local p = promise.new()
-
-    local a = false
-    local b = false
-
-    promise1:next(function ()
-        a = true
-        if b then
-            p:resolve()
-        end
-    end)
-
-    promise2:next(function ()
-        b = true
-        if a then
-            p:resolve()
-        end
-    end)
-
-    return p
-end
-
 function LuckyWheel_PlayAnim(ped, coords, timer)
     local animDict = getAnimDict(ped)
     local anim = anims[1]
@@ -367,3 +344,26 @@ RegisterNetEvent('gl_casino:luckywheel:spinTo')
 AddEventHandler('gl_casino:luckywheel:spinTo', function(pos)
 end)
 
+RegisterNetEvent('gl_casino:cl:luckywheel', function (event, arg1)
+    if event == 'startSpinning' then
+        luckywheelStartSpinning()
+    elseif event == 'stopSpinning' then
+        luckywheelStopSpinning(arg1)
+    elseif event == 'setOccupied' then
+        luckywheelSetOccupied(arg1)
+    elseif event == 'reset' then
+        luckywheelReset()
+    end
+end)
+
+function luckywheelStartSpinning()
+end
+
+function luckywheelStopSpinning(pos)
+end
+
+function luckywheelSetOccupied(occupied)
+end
+
+function luckywheelReset()
+end

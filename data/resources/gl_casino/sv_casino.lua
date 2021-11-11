@@ -1,13 +1,11 @@
 
 local casinoPeds = {}
 
-local wheelPos = 1
-local wheelSpinning = false
 
 function playerEnterCasino()
     local src = source
     addPeds(src)
-    TriggerClientEvent('gl_casino:luckywheel:setSpin', src, wheelPos)
+    luckyWheelPlayerEnter(src)
 end
 
 function playerLeaveCasino()
@@ -38,13 +36,15 @@ end
 RegisterNetEvent('gl_casino:playerEnterCasino', playerEnterCasino)
 RegisterNetEvent('gl_casino:playerLeaveCasino', playerLeaveCasino)
 
-
-RegisterCommand('setWheel', function(source, args, rawCommand)
-    wheelPos = tonumber(args[1]) or 1
-end, false)
-
 function BroadcastCasinoEvent(event, ...)
     for k,v in pairs(casinoPeds) do
         TriggerClientEvent(event, v, ...)
     end
 end
+
+AddEventHandler('playerDropped', function (reason)
+    local src = source
+    removePeds(src)
+    slotsPlayerLeft(src)
+    luckywheelPlayerLeft(src)
+end)

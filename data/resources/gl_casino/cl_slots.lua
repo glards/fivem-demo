@@ -223,6 +223,8 @@ local function getAnimDict(ped)
     return animDicts[dict]
 end
 
+local reelStartPos = 15
+
 SlotMachine = { }
 
 function SlotMachine:new(id, pos, seatPos, type, reelHash)
@@ -243,7 +245,7 @@ function SlotMachine:new(id, pos, seatPos, type, reelHash)
             object = nil,
             pos = reelPos,
             heading = o.pos.w,
-            angle = 0.0,
+            angle = reelStartPos * 22.5,
             nextAnim = 0,
             endPos = nil,
             spinning = false
@@ -252,6 +254,7 @@ function SlotMachine:new(id, pos, seatPos, type, reelHash)
     end
 
     o.occupied = false
+    o.spinning = false
 
     return o
 end
@@ -265,7 +268,7 @@ function SlotMachine:createObjects()
         local o = CreateObject(self.reelHash, reel.pos, false, false, true)
         FreezeEntityPosition(o, true)
         SetEntityCollision(o, false, false)
-        SetEntityRotation(o, 0.0, 0.0, reel.heading, 2, true)
+        SetEntityRotation(o, reel.angle, 0.0, reel.heading, 2, true)
         reel.object = o
     end
 
@@ -273,11 +276,18 @@ function SlotMachine:createObjects()
 end
 
 function SlotMachine:startSpinning()
+    self.spinning = true
     self.fixing = 1
     for i, reel in pairs(self.reels) do
         reel.endPos = nil
         reel.spinning = true
     end
+
+    local soundRef = soundsRef[self.type]
+    local sound = sounds[7]
+
+    print("Playing sound", sound, soundRef, self.pos)
+    PlaySoundFromCoord(-1, sound, self.pos.x, self.pos.y, self.pos.z, soundRef, true, 50.0, false)
 end
 
 function SlotMachine:stopSpinning(reel1, reel2, reel3)
@@ -286,8 +296,7 @@ function SlotMachine:stopSpinning(reel1, reel2, reel3)
     self.reels[3].endPos = reel3
 
     self.fixing = 1
-
-    print("StopSpinning", self.id, reel1, reel2, reel3)
+    self.spinning = false
 end
 
 function clamp(v, min, max)
@@ -462,6 +471,7 @@ function Slots_InsideCasino(ped, coords, timer)
     if controlPressed and closestSlotMachine then
         usedSlotmachine = closestSlotMachine
         usedSlotmachine.occupied = true
+        TriggerServerEvent('gl_casino:sv:slots', usedSlotmachine.id, 'enter')
         currentState = Slots_WalkAndSit
     end
 end
@@ -519,6 +529,7 @@ function Slots_Idle(ped, coords, timer)
 
     local exitPressed = IsControlJustPressed(0, INPUT_ENTER)
     if exitPressed then
+        TriggerServerEvent('gl_casino:sv:slots', usedSlotmachine.id, 'leave')
         currentState = Slots_AnimExit
         return
     end
@@ -700,12 +711,12 @@ RegisterCommand('reelIndex', function(source, args, rawCommand)
 end, false)
 
 RegisterNetEvent('gl_casino:cl:slots', function (id, event, arg1, arg2, arg3)
-    print("Event", id, event)
-
     if event == 'startSpinning' then
         slotsStartSpinning(id)
     elseif event == 'stopSpinning' then
         slotsStopSpinning(id, arg1, arg2, arg3)
+    elseif event == 'setOccupied' then
+        slotsSetOccupied(id, arg1)
     elseif event == 'reset' then
         slotsReset()
     end
@@ -715,6 +726,14 @@ function slotsReset()
     local ped = PlayerPedId()
     ClearPedTasksImmediately(ped)
     currentState = Slots_InsideCasino
+end
+
+function slotsSetOccupied(id, occupied)
+    if id > #slotMachineInstances or id < 1 then
+        return
+    end
+    local slotMachine = slotMachineInstances[id]
+    slotMachine.occupied = occupied
 end
 
 function slotsStartSpinning(id)

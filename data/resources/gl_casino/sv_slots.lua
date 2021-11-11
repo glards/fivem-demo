@@ -24,7 +24,15 @@ end
 RegisterNetEvent('gl_casino:sv:slots', slotsHandling)
 
 function clientPlaySlots(src, id, event)
-    print("Slot event", id, event)
+    if id < 1 or id > #SlotMachines then
+        return
+    end
+
+    local slotMachine = SlotMachines[id]
+    if slotMachine.ped ~= src then
+        TriggerClientEvent('gl_casino:cl:slots', src, id, 'reset')
+        return
+    end
     
     Citizen.Wait(2000)
 
@@ -33,6 +41,9 @@ function clientPlaySlots(src, id, event)
     local reel1 = math.random(0, 15)
     local reel2 = math.random(0, 15)
     local reel3 = math.random(0, 15)
+
+    if reel1 == reel2 and reel2 == reel3 then
+    end
 
     Citizen.Wait(2000)
 
@@ -52,6 +63,7 @@ function clientEnterSlots(src, id, event)
 
     slotMachine.occupied = true
     slotMachine.ped = src
+    BroadcastCasinoEvent('gl_casino:cl:slots', id, 'setOccupied', true)
 end
 
 function clientLeaveSlots(src, id, event)
@@ -60,6 +72,19 @@ function clientLeaveSlots(src, id, event)
     end
 
     local slotMachine = SlotMachines[id]
-    slotMachine.occupied = false
-    slotMachine.ped = false
+    if slotMachine.occupied and src == slotMachine.ped then
+        slotMachine.occupied = false
+        slotMachine.ped = nil
+        BroadcastCasinoEvent('gl_casino:cl:slots', id, 'setOccupied', false)
+    end
+end
+
+function slotsPlayerLeft(src)
+    for k,v in pairs(SlotMachines) do
+        if v.ped == src then
+            v.occupied = false
+            v.ped = nil
+            BroadcastCasinoEvent('gl_casino:cl:slots', v.id, 'setOccupied', false)
+        end
+    end
 end
