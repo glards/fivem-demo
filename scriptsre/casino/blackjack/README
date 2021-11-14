@@ -1,0 +1,130 @@
+Animation stuff
+---------------
+
+
+char* func_215(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 0:
+			return "sit_enter_left";
+		
+		case 1:
+			return "sit_enter_left_side";
+		
+		case 2:
+			return "sit_enter_right_side";
+		
+		default:
+	}
+	return "sit_enter_left";
+}
+
+char* func_216()
+{
+	return "anim_casino_b@amb@casino@games@shared@player@";
+}
+
+Vector3 func_217(int iParam0)
+{
+	int iVar0;
+	
+	if (Local_2041.f_257 == 1)
+	{
+		if (func_420() != func_419())
+		{
+			iVar0 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(func_70(func_380(iParam0)), 1f, func_218(Global_2426865[func_420() /*449*/].f_448), false, false, false);
+		}
+	}
+	else if (func_380(iParam0) == 0 || func_380(iParam0) == 1)
+	{
+		iVar0 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(func_70(func_380(iParam0)), 1f, joaat("vw_prop_casino_blckjack_01"), false, false, false);
+	}
+	else
+	{
+		iVar0 = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(func_70(func_380(iParam0)), 1f, joaat("vw_prop_casino_blckjack_01b"), false, false, false);
+	}
+	if (ENTITY::DOES_ENTITY_EXIST(iVar0) && ENTITY::DOES_ENTITY_HAVE_DRAWABLE(iVar0))
+	{
+		switch (iParam0)
+		{
+			case 0:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_04"));
+			
+			case 1:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_03"));
+			
+			case 2:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_02"));
+			
+			case 3:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_01"));
+			
+			case 4:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_04"));
+			
+			case 5:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_03"));
+			
+			case 6:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_02"));
+			
+			case 7:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_01"));
+			
+			case 8:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_04"));
+			
+			case 9:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_03"));
+			
+			case 10:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_02"));
+			
+			case 11:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_01"));
+			
+			case 12:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_04"));
+			
+			case 13:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_03"));
+			
+			case 14:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_02"));
+			
+			case 15:
+				return ENTITY::_GET_ENTITY_BONE_ROTATION(iVar0, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(iVar0, "Chair_Base_01"));
+			}
+		
+		default:
+	}
+	return 0f, 0f, 0f;
+}
+
+int func_218(int iParam0)
+{
+	switch (iParam0)
+	{
+		case 1:
+			return joaat("h4_prop_casino_blckjack_01a");
+			break;
+		
+		case 2:
+			return joaat("h4_prop_casino_blckjack_01b");
+			break;
+		
+		case 3:
+			return joaat("h4_prop_casino_blckjack_01c");
+			break;
+		
+		case 4:
+			return joaat("h4_prop_casino_blckjack_01d");
+			break;
+		
+		case 5:
+			return joaat("h4_prop_casino_blckjack_01e");
+			break;
+	}
+	return joaat("vw_prop_casino_blckjack_01b");
+}
