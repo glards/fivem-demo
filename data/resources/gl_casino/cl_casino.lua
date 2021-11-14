@@ -183,4 +183,3 @@ end
 RegisterCommand('bigwin', function(source, args, rawCommand)
     showBigWin = true
 end, false)
-

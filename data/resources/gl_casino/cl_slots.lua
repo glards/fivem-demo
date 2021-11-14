@@ -1,12 +1,5 @@
-wheelOffset = vector3(0.0, -0.12, 1.6)
 
-slotOffsets = {
-    vector3(-0.115, 0.047, 0.906),
-    vector3(0.005, 0.047, 0.906),
-    vector3(0.125, 0.047, 0.906)
-}
-
-seats = {
+local seats = {
     vector3(1101.01, 229.876, -50.8409),
     vector3(1101.59, 230.626, -50.8409),
     vector3(1101.95, 231.501, -50.8409),
@@ -63,7 +56,7 @@ seats = {
     vector3(1139.34, 251.061, -52.0409)
 }
 
-slotMachines = {
+local slotMachines = {
     vector4( 1100.483, 230.4082, -50.8409, 45.0),
     vector4( 1100.939, 231.0017, -50.8409, 60.0),
     vector4( 1101.221, 231.6943, -50.8409, 75.0),
@@ -120,7 +113,7 @@ slotMachines = {
     vector4( 1139, 251.7306, -52.0409, 27.0)
 }
 
-slotMachinesTypes = {
+local slotMachinesTypes = {
     4,
     5,
     6,
@@ -177,7 +170,18 @@ slotMachinesTypes = {
     5
 }
 
-machinesSlotWheelHashes = {
+local payTable = {
+    200,
+    50,
+    50,
+    10,
+    1000,
+    200,
+    1000,
+    10
+}
+
+local machinesSlotWheelHashes = {
     nil,
     nil,
     nil,
@@ -188,7 +192,7 @@ machinesSlotWheelHashes = {
     `vw_Prop_vw_slot_wheel_08a`
 }
 
-machinesObjectHashes = {
+local machinesObjectHashes = {
     `vw_prop_casino_slot_01a`,
     `vw_prop_casino_slot_02a`,
     `vw_prop_casino_slot_03a`,
@@ -199,7 +203,7 @@ machinesObjectHashes = {
     `vw_prop_casino_slot_08a`,
 }
 
-machinesSlotReelHashes = {
+local machinesSlotReelHashes = {
     `vw_Prop_Casino_Slot_01a_reels`,
     `vw_Prop_Casino_Slot_02a_reels`,
     `vw_Prop_Casino_Slot_03a_reels`,
@@ -210,7 +214,7 @@ machinesSlotReelHashes = {
     `vw_Prop_Casino_Slot_08a_reels`,
 }
 
-animDicts = {
+local animDicts = {
     "anim_casino_a@amb@casino@games@slots@female",
     "anim_casino_a@amb@casino@games@slots@male"
 }
@@ -221,163 +225,6 @@ local function getAnimDict(ped)
         dict = 2
     end
     return animDicts[dict]
-end
-
-local reelStartPos = 15
-
-SlotMachine = { }
-
-function SlotMachine:new(id, pos, seatPos, type, reelHash)
-    o = {id = id, pos = pos, seatPos = seatPos, type = type, reelHash = reelHash}
-    setmetatable(o, self)
-    self.__index = self
-    o.reels = {}
-    
-    local slotOffsets = {
-        vector3(-0.115, 0.047, 0.906),
-        vector3(0.005, 0.047, 0.906),
-        vector3(0.125, 0.047, 0.906)
-    }
-    
-    for j=1,3 do
-        local reelPos = GetObjectOffsetFromCoords(o.pos, slotOffsets[j])
-        local reel = {
-            object = nil,
-            pos = reelPos,
-            heading = o.pos.w,
-            angle = reelStartPos * 22.5,
-            nextAnim = 0,
-            endPos = nil,
-            spinning = false
-        }
-        table.insert(o.reels, reel)
-    end
-
-    o.occupied = false
-    o.spinning = false
-
-    return o
-end
-
-function SlotMachine:createObjects()
-    if self.objectCreated then
-        return
-    end
-
-    for _, reel in pairs(self.reels) do
-        local o = CreateObject(self.reelHash, reel.pos, false, false, true)
-        FreezeEntityPosition(o, true)
-        SetEntityCollision(o, false, false)
-        SetEntityRotation(o, reel.angle, 0.0, reel.heading, 2, true)
-        reel.object = o
-    end
-
-    self.objectCreated = true
-end
-
-function SlotMachine:startSpinning()
-    self.spinning = true
-    self.fixing = 1
-    for i, reel in pairs(self.reels) do
-        reel.endPos = nil
-        reel.spinning = true
-    end
-
-    local soundRef = soundsRef[self.type]
-    local sound = sounds[7]
-
-    print("Playing sound", sound, soundRef, self.pos)
-    PlaySoundFromCoord(-1, sound, self.pos.x, self.pos.y, self.pos.z, soundRef, true, 50.0, false)
-end
-
-function SlotMachine:stopSpinning(reel1, reel2, reel3)
-    self.reels[1].endPos = reel1
-    self.reels[2].endPos = reel2
-    self.reels[3].endPos = reel3
-
-    self.fixing = 1
-    self.spinning = false
-end
-
-function clamp(v, min, max)
-    local d = max - min
-
-    while v < min do
-        v = v + d
-    end
-
-    while v > max do
-        v = v - d
-    end
-
-    return v
-end
-
--- 0.0, 1.0 -> 1.0
--- 359.0, 0.0  -> 1.0
--- 0.0, 359.0 -> 1.0
--- 1.0, 0.0 -> 1.0
-function dist(a, b, min, max)
-    local d = max - min
-
-    return math.min(
-            math.min(
-                math.abs((b + d) - a),
-                math.abs(b - a)
-            ),
-            math.abs(b - (a + d))
-           )
-end
-
-function SlotMachine:animate(gameTimer)
-    local DELAY = 16
-    local SPEED = 5.0
-    local POS_ANGLE = 22.5
-    
-    for i, reel in pairs(self.reels) do
-        if gameTimer > reel.nextAnim and reel.spinning then
-            local nextAngle = clamp(reel.angle + SPEED, 0.0, 360.0)
-
-            if reel.endPos and self.fixing == i then
-                local reelAngle = reel.endPos * POS_ANGLE
-                if dist(reelAngle, nextAngle, 0.0, 360.0) < 6.0 then
-                    local offset = (math.random()-0.5)*6.0
-                    nextAngle = reelAngle + offset
-                    self.fixing = self.fixing + 1
-                    reel.spinning = false
-                end
-            end
-
-            reel.angle = nextAngle
-            reel.nextAnim = gameTimer + DELAY
-        end
-
-        if self.objectCreated then
-            SetEntityRotation(reel.object, reel.angle, 0.0, reel.heading, 2, true)
-        end
-    end
-end
-
-function SlotMachine:destroyObjects()
-    if not self.objectCreated then
-        return
-    end
-
-    for _, reel in pairs(self.reels) do
-        DeleteEntity(reel.object)
-    end
-    self.objectCreated = false
-end
-
-function SlotMachine:tick(playerPed, playerPos, gameTimer)
-    -- Game checks if player is within 10.0 units of the machine to create/destroy objects
-    if #(playerPos - self.pos.xyz) > 10.0 then
-        self:destroyObjects()
-    else
-        self:createObjects()
-    end
-
-    self:animate(gameTimer)
 end
 
 local slotMachineInstances = {}
@@ -464,7 +311,7 @@ function Slots_InsideCasino(ped, coords, timer)
     end
 
     if closestSlotMachine then
-        exports.gl_utils:drawNotification(string.format("Appuyer sur ~INPUT_ENTER~ pour jouer sur la machine %04d", closestSlotMachine.id))
+        exports.gl_utils:drawNotification(string.format("Appuyer sur ~INPUT_ENTER~ pour jouer sur la machine ~h~%04d~h~ pour ~g~%d$~s~", closestSlotMachine.id, payTable[closestSlotMachine.type]))
     end
 
     local controlPressed = IsControlJustPressed(0, INPUT_ENTER)
@@ -556,8 +403,19 @@ function Slots_Play(ped, coords, timer)
     Citizen.Await(exports.gl_utils:playNetworkSynchronizedSceneWithObject(ped, objectHash, objectAnim, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
 
     anim = anims[math.random(21, 23)]
-    Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
+    --Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0))
+    exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 1000.0)
 
+    currentState = Slots_WaitStopSpinning
+end
+
+function Slots_WaitStopSpinning(ped, coords, timer)
+    if usedSlotmachine.spinning then
+        return
+    end
+
+    currentState = Slots_Idle
+    --currentState = Slots_Play
 end
 
 function Slots_AnimExit(ped, coords, timer)
@@ -750,5 +608,4 @@ function slotsStopSpinning(id, reel1, reel2, reel3)
     end
     local slotMachine = slotMachineInstances[id]
     slotMachine:stopSpinning(reel1, reel2, reel3)
-    currentState = Slots_Idle
 end
