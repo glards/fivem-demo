@@ -1,6 +1,13 @@
 local running = false
+
 local wheel = nil
+
+local wheelPos = 0
+local wheelOccupied = false
+local wheelSpinning = false
+
 local currentState = nil
+
 local animDicts = {
     "ANIM_CASINO_A@AMB@CASINO@GAMES@LUCKY7WHEEL@FEMALE",
     "ANIM_CASINO_A@AMB@CASINO@GAMES@LUCKY7WHEEL@MALE"
@@ -147,6 +154,7 @@ function startLuckyWheel()
     wheel = CreateObjectNoOffset(hash, vector3(1111.052, 229.8579, -49.133), false, false, true)
     SetEntityCanBeDamaged(wheel, false)
 
+    Citizen.CreateThread(luckyWheelPlayerThread)
     Citizen.CreateThread(luckyWheelThread)
 end
 
@@ -161,7 +169,7 @@ function stopLuckyWheel()
     wheel = nil
 end
 
-function luckyWheelThread()
+function luckyWheelPlayerThread()
     local ped = PlayerPedId()
 
     currentState = LuckyWheel_InsideCasino
@@ -178,8 +186,14 @@ function luckyWheelThread()
     end
 end
 
+function luckyWheelThread()
+    while running do
+        Citizen.Wait(0)
+    end
+end
+
 function LuckyWheel_InsideCasino(ped, coords, timer)
-    if #(coords - luckyWheelCirclePos) < 2.0 then        
+    if not wheelOccupied and #(coords - luckyWheelCirclePos) < 2.0 then
         exports.gl_utils:drawNotification("Appuyer sur ~INPUT_ENTER~ pour jouer à la roue de la chance")
 
         local enterPressed = IsControlJustPressed(0, INPUT_ENTER)
@@ -357,13 +371,18 @@ RegisterNetEvent('gl_casino:cl:luckywheel', function (event, arg1)
 end)
 
 function luckywheelStartSpinning()
+    wheelPos = nil
+    wheelSpinning = true
 end
 
 function luckywheelStopSpinning(pos)
+    wheelPos = pos
 end
 
 function luckywheelSetOccupied(occupied)
+    wheelOccupied = occupied
 end
 
 function luckywheelReset()
+    currentState = LuckyWheel_InsideCasino
 end
