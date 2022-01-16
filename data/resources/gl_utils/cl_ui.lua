@@ -1,6 +1,18 @@
 
+function addFeedNotification(text, color, blink)
+	if color then ThefeedNextPostBackgroundColor(color) end
+	PlaySoundFrontend(-1, "OTHER_TEXT", "HUD_AWARDS", 0)
+	BeginTextCommandThefeedPost("STRING")
+	AddTextComponentSubstringPlayerName(text)
+	EndTextCommandThefeedPostTicker(blink or false, false)
+end
 
-
+function drawSubtitle(subtitle, duration)
+    BeginTextCommandPrint("STRING")
+    AddTextComponentSubstringWebsite(subtitle)
+	EndTextCommandPrint(duration, true)
+	DebugPrint("SUBTITLE: "..subtitle)
+end
 
 function drawNotification(text)
     SetTextComponentFormat('STRING')
@@ -50,6 +62,7 @@ function drawInstructionalButtons(data)
     return scaleform
 end
 
-
+exports('addFeedNotification', addFeedNotification)
+exports('drawSubtitle', drawSubtitle)
 exports('drawNotification', drawNotification)
 exports('drawInstructionalButtons', drawInstructionalButtons)
