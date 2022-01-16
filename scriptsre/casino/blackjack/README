@@ -1,6 +1,11 @@
 Animation stuff
 ---------------
 
+char* func_88()
+{
+	return "anim_casino_b@amb@casino@games@blackjack@player";
+}
+
 
 char* func_215(int iParam0)
 {
@@ -128,3 +133,458 @@ int func_218(int iParam0)
 	}
 	return joaat("vw_prop_casino_blckjack_01b");
 }
+
+
+
+Card creation :
+
+if (func_395(Local_124.f_899[iVar19 /*9*/][iVar12], Local_2041.f_236) != 0)
+{
+	Local_2041.f_648[iVar13] = OBJECT::CREATE_OBJECT_NO_OFFSET(func_395(Local_124.f_899[iVar19 /*9*/][iVar12], Local_2041.f_236), OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_389(iVar12, iVar18, 0)), false, false, true);
+	ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_648[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_389(iVar12, iVar18, 0)), false, false, true);
+	ENTITY::SET_ENTITY_ROTATION(Local_2041.f_648[iVar13], Var15 + func_388(iVar12, iVar18, 0, func_392(iVar13)), 2, true);
+}
+Jump @2150; //curOff = 1855
+if (ENTITY::GET_ENTITY_MODEL(Local_2041.f_648[iVar13]) != func_395(Local_124.f_899[iVar19 /*9*/][iVar12], Local_2041.f_236))
+{
+	OBJECT::DELETE_OBJECT(&(Local_2041.f_648[iVar13]));
+}
+
+
+Vector3 func_388(int iParam0, int iParam1, bool bParam2, bool bParam3)
+{
+	struct<3> Var0;
+	
+	Var0 = { 0f, 0f, 0f };
+	if (!bParam2)
+	{
+		switch (iParam1)
+		{
+			case 0:
+				switch (iParam0)
+				{
+					case 0:
+						Var0 = { 0f, 0f, 69.12f };
+						break;
+					
+					case 1:
+						Var0 = { 0f, 0f, 67.8f };
+						break;
+					
+					case 2:
+						Var0 = { 0f, 0f, 66.6f };
+						break;
+					
+					case 3:
+						Var0 = { 0f, 0f, 70.44f };
+						break;
+					
+					case 4:
+						Var0 = { 0f, 0f, 70.84f };
+						break;
+					
+					case 5:
+						Var0 = { 0f, 0f, 67.88f };
+						break;
+					
+					case 6:
+						Var0 = { 0f, 0f, 69.56f };
+						break;
+				}
+				break;
+			
+			case 1:
+				switch (iParam0)
+				{
+					case 0:
+						Var0 = { 0f, 0f, 22.11f };
+						break;
+					
+					case 1:
+						Var0 = { 0f, 0f, 22.32f };
+						break;
+					
+					case 2:
+						Var0 = { 0f, 0f, 20.8f };
+						break;
+					
+					case 3:
+						Var0 = { 0f, 0f, 19.8f };
+						break;
+					
+					case 4:
+						Var0 = { 0f, 0f, 19.44f };
+						break;
+					
+					case 5:
+						Var0 = { 0f, 0f, 26.28f };
+						break;
+					
+					case 6:
+						Var0 = { 0f, 0f, 22.68f };
+						break;
+				}
+				break;
+			
+			case 2:
+				switch (iParam0)
+				{
+					case 0:
+						Var0 = { 0f, 0f, -21.43f };
+						break;
+					
+					case 1:
+						Var0 = { 0f, 0f, -20.16f };
+						break;
+					
+					case 2:
+						Var0 = { 0f, 0f, -16.92f };
+						break;
+					
+					case 3:
+						Var0 = { 0f, 0f, -23.4f };
+						break;
+					
+					case 4:
+						Var0 = { 0f, 0f, -21.24f };
+						break;
+					
+					case 5:
+						Var0 = { 0f, 0f, -23.76f };
+						break;
+					
+					case 6:
+						Var0 = { 0f, 0f, -19.44f };
+						break;
+				}
+				break;
+			
+			case 3:
+				switch (iParam0)
+				{
+					case 0:
+						Var0 = { 0f, 0f, -67.03f };
+						break;
+					
+					case 1:
+						Var0 = { 0f, 0f, -69.12f };
+						break;
+					
+					case 2:
+						Var0 = { 0f, 0f, -64.44f };
+						break;
+					
+					case 3:
+						Var0 = { 0f, 0f, -67.68f };
+						break;
+					
+					case 4:
+						Var0 = { 0f, 0f, -63.72f };
+						break;
+					
+					case 5:
+						Var0 = { 0f, 0f, -68.4f };
+						break;
+					
+					case 6:
+						Var0 = { 0f, 0f, -64.44f };
+						break;
+				}
+				break;
+		}
+	}
+	if (bParam3)
+	{
+		Var0.f_2 = (Var0.f_2 + 90f);
+	}
+	return Var0;
+}
+
+Vector3 func_389(int iParam0, int iParam1, bool bParam2)
+{
+	if (!bParam2)
+	{
+		switch (iParam1)
+		{
+			case 0:
+				switch (iParam0)
+				{
+					case 0:
+						return 0.5737f, 0.2376f, 0.948025f;
+					
+					case 1:
+						return 0.562975f, 0.2523f, 0.94875f;
+					
+					case 2:
+						return 0.553875f, 0.266325f, 0.94955f;
+					
+					case 3:
+						return 0.5459f, 0.282075f, 0.9501f;
+					
+					case 4:
+						return 0.536125f, 0.29645f, 0.95085f;
+					
+					case 5:
+						return 0.524975f, 0.30975f, 0.9516f;
+					
+					case 6:
+						return 0.515775f, 0.325325f, 0.95235f;
+					
+					default:
+				}
+				break;
+			
+			case 1:
+				switch (iParam0)
+				{
+					case 0:
+						return 0.2325f, -0.1082f, 0.94805f;
+					
+					case 1:
+						return 0.23645f, -0.0918f, 0.949f;
+					
+					case 2:
+						return 0.2401f, -0.074475f, 0.950225f;
+					
+					case 3:
+						return 0.244625f, -0.057675f, 0.951125f;
+					
+					case 4:
+						return 0.249675f, -0.041475f, 0.95205f;
+					
+					case 5:
+						return 0.257575f, -0.0256f, 0.9532f;
+					
+					case 6:
+						return 0.2601f, -0.008175f, 0.954375f;
+					
+					default:
+				}
+				break;
+			
+			case 2:
+				switch (iParam0)
+				{
+					case 0:
+						return -0.2359f, -0.1091f, 0.9483f;
+					
+					case 1:
+						return -0.221025f, -0.100675f, 0.949f;
+					
+					case 2:
+						return -0.20625f, -0.092875f, 0.949725f;
+					
+					case 3:
+						return -0.193225f, -0.07985f, 0.950325f;
+					
+					case 4:
+						return -0.1776f, -0.072f, 0.951025f;
+					
+					case 5:
+						return -0.165f, -0.060025f, 0.951825f;
+					
+					case 6:
+						return -0.14895f, -0.05155f, 0.95255f;
+					
+					default:
+				}
+				break;
+			
+			case 3:
+				switch (iParam0)
+				{
+					case 0:
+						return -0.5765f, 0.2229f, 0.9482f;
+					
+					case 1:
+						return -0.558925f, 0.2197f, 0.949175f;
+					
+					case 2:
+						return -0.5425f, 0.213025f, 0.9499f;
+					
+					case 3:
+						return -0.525925f, 0.21105f, 0.95095f;
+					
+					case 4:
+						return -0.509475f, 0.20535f, 0.9519f;
+					
+					case 5:
+						return -0.491775f, 0.204075f, 0.952825f;
+					
+					case 6:
+						return -0.4752f, 0.197525f, 0.9543f;
+					
+					default:
+				}
+				break;
+		}
+	}
+	return 0f, 0f, 0f;
+}
+
+
+-- Dealer anims
+
+char* func_37(int iParam0)
+{
+	if (Local_124.f_1550[iParam0] >= 7)
+	{
+		return "female_deal_card_self";
+	}
+	return "deal_card_self";
+}
+
+char* func_38(int iParam0)
+{
+	if (Local_124.f_1550[iParam0] >= 7)
+	{
+		return "female_deal_card_player_04";
+	}
+	return "deal_card_player_04";
+}
+
+char* func_39(int iParam0)
+{
+	if (Local_124.f_1550[iParam0] >= 7)
+	{
+		return "female_deal_card_player_03";
+	}
+	return "deal_card_player_03";
+}
+
+char* func_40(int iParam0)
+{
+	if (Local_124.f_1550[iParam0] >= 7)
+	{
+		return "female_deal_card_player_02";
+	}
+	return "deal_card_player_02";
+}
+
+void func_41(int iParam0, int iParam1)
+{
+	Local_124.f_1510[iParam1] = iParam0;
+}
+
+char* func_42(int iParam0)
+{
+	if (Local_124.f_1550[iParam0] >= 7)
+	{
+		return "female_deal_card_player_01";
+	}
+	return "deal_card_player_01";
+}
+
+
+
+Dealer anim attachment :
+
+
+Local_2041.f_260[iVar13] = -1;
+if (!ENTITY::DOES_ENTITY_EXIST(Local_2041.f_603[iVar13]))
+{
+	iVar24 = Local_124.f_846[iVar7 /*13*/][iVar12];
+	if (!bVar25)
+	{
+		iVar24 = 0;
+	}
+	if (!MISC::IS_STRING_NULL_OR_EMPTY(func_390(Local_124.f_846[iVar7 /*13*/][iVar12], 1)) && func_395(iVar24, Local_2041.f_236) != 0)
+	{
+		Local_2041.f_603[iVar13] = OBJECT::CREATE_OBJECT_NO_OFFSET(func_395(iVar24, Local_2041.f_236), OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+		ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+		ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, bVar25), 2, true);
+		Local_2041.f_260[iVar13] = -1;
+	}
+}
+else if (iVar12 == 0)
+{
+	if (NETWORK::NETWORK_DOES_ENTITY_EXIST_WITH_NETWORK_ID(Local_124.f_1595[iVar7]) && !PED::IS_PED_INJURED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7])))
+	{
+		-- animDict "anim_casino_b@amb@casino@games@blackjack@dealer"
+		-- anim : female_check_and_turn_card / check_and_turn_card
+		if (ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_33(iVar7), 3))
+		{
+			if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), -1345695206))
+			{
+				if (!ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+				{
+					OBJECT::DELETE_OBJECT(&(Local_2041.f_603[iVar13]));
+					Local_2041.f_260[iVar13] = -1;
+					Local_2041.f_603[iVar13] = OBJECT::CREATE_OBJECT_NO_OFFSET(func_395(Local_124.f_846[iVar7 /*13*/][iVar12], Local_2041.f_236), OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, 0), 2, true);
+					ENTITY::ATTACH_ENTITY_TO_ENTITY(Local_2041.f_603[iVar13], NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), PED::GET_PED_BONE_INDEX(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 28422), 0f, 0f, 0f, 0f, 0f, 0f, false, false, false, true, 2, true);
+				}
+			}
+			else if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 585557868))
+			{
+				if (ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+				{
+					ENTITY::DETACH_ENTITY(Local_2041.f_603[iVar13], false, true);
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, 1), 2, true);
+				}
+			}
+		}
+		-- animDict "anim_casino_b@amb@casino@games@blackjack@dealer"
+		-- anim : female_check_card / check_card
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_28(iVar7), 3))
+		{
+			if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), -1345695206))
+			{
+				if (!ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+				{
+					ENTITY::ATTACH_ENTITY_TO_ENTITY(Local_2041.f_603[iVar13], NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), PED::GET_PED_BONE_INDEX(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 28422), 0f, 0f, 0f, 0f, 0f, 0f, false, false, false, true, 2, true);
+				}
+			}
+			else if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 585557868))
+			{
+				if (ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+				{
+					ENTITY::DETACH_ENTITY(Local_2041.f_603[iVar13], false, true);
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, 0), 2, true);
+				}
+			}
+		}
+		-- animDict "anim_casino_b@amb@casino@games@blackjack@dealer"
+		-- anim : female_turn_card / turn_card
+		else if (ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_11(iVar7), 3))
+		{
+			if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), -1345695206))
+			{
+				if (!ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+				{
+					OBJECT::DELETE_OBJECT(&(Local_2041.f_603[iVar13]));
+					Local_2041.f_260[iVar13] = -1;
+					Local_2041.f_603[iVar13] = OBJECT::CREATE_OBJECT_NO_OFFSET(func_395(Local_124.f_846[iVar7 /*13*/][iVar12], Local_2041.f_236), OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, 0), 2, true);
+					ENTITY::ATTACH_ENTITY_TO_ENTITY(Local_2041.f_603[iVar13], NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), PED::GET_PED_BONE_INDEX(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 28422), 0f, 0f, 0f, 0f, 0f, 0f, false, false, false, true, 2, true);
+				}
+			}
+			else if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 585557868))
+			{
+				if (ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+				{
+					ENTITY::DETACH_ENTITY(Local_2041.f_603[iVar13], false, true);
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+					ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, 1), 2, true);
+				}
+			}
+		}
+		else if (ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+		{
+			ENTITY::DETACH_ENTITY(Local_2041.f_603[iVar13], false, true);
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+			ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, bVar25), 2, true);
+		}
+	}
+}
+else if (ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
+{
+	ENTITY::DETACH_ENTITY(Local_2041.f_603[iVar13], false, true);
+	ENTITY::SET_ENTITY_COORDS_NO_OFFSET(Local_2041.f_603[iVar13], OBJECT::_GET_OBJECT_OFFSET_FROM_COORDS(func_70(iVar7), Var15.f_2, func_383(iVar12)), false, false, true);
+	ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, bVar25), 2, true);
+}
+
