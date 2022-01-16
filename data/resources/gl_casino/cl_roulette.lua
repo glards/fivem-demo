@@ -10,10 +10,16 @@ local roulettePos = {
 
 local dealerOffset = vector3(-0.68, 0.97, 0.0)
 
-local dealers = {
-    `s_f_y_casino_01`,
-    `S_M_Y_Casino_01`
+
+local dealersAnimDicts = {
+    'anim_casino_b@amb@casino@games@roulette@dealer',
+    'anim_casino_b@amb@casino@games@roulette@dealer_female'
 }
+
+local tableAnimDict = 'anim_casino_b@amb@casino@games@roulette@table'
+
+local playerAnimDict = 'anim_casino_b@amb@casino@games@roulette@player'
+
 
 local rouletteProp = {
     `vw_prop_casino_roulette_01`,
@@ -45,22 +51,9 @@ function createRoulette()
 end
 
 
-Citizen.CreateThread(function()
-    CreateDealer()
-
-    CreateRoulette()
-end)
+local rouletteDealers = {}
 
 function CreateDealer()
-    for i=1,#dealers do
-        local hash = dealers[i]
-
-        RequestModel(hash)
-        while not HasModelLoaded(hash) do
-            Citizen.Wait(0)
-        end
-    end
-
     for i=1,#roulettePos do
         local posHeading = roulettePos[i]
 
@@ -83,21 +76,19 @@ function CreateDealer()
             heading = heading + 360.0
         end
 
-        local ped = CreatePed(26, dealers[1], pos, heading, false, true)
-        SetEntityCanBeDamaged(ped, false)
-        SetPedAsEnemy(ped, false)
-        SetBlockingOfNonTemporaryEvents(ped, true)
-        SetPedResetFlag(ped, 249, true)
-        SetPedConfigFlag(ped, 185, true)
-        SetPedConfigFlag(ped, 108, true)
-        Citizen.InvokeNative(0x352E2B5CF420BF3B, ped, 1)
-        SetPedCanEvasiveDive(ped, false)
-        Citizen.InvokeNative(0x2F3C3D9F50681DE4, ped, true)
-        SetPedCanRagdollFromPlayerImpact(ped, false)
-        SetPedConfigFlag(ped, 208, true)
-        SetEntityAsMissionEntity(ped, true, false)
+        local dealerGenre = 2
+
+        local ped = CreateDealerPed(pos, heading, dealerGenre)
+        table.insert(rouletteDealers, ped)
+
+        local dealerDict = dealersAnimDicts[dealerGenre]
+        local anim = 'no_more_bets'
+
+        exports.gl_utils:playNetworkSynchronizedScene(ped, dealerDict, anim, pos, vector3(0.0,0.0,heading), false, true, 1.0, 1.0, 5, 16, 1000.0)
     end
 end
+
+local rouletteObjects = {}
 
 function CreateRoulette()
     for i=1,#rouletteProp do
@@ -121,8 +112,38 @@ function CreateRoulette()
 
         local roulette = CreateObjectNoOffset(rouletteProp[1], pos, false, false, false)
         SetEntityHeading(roulette, heading)
+
+        table.insert(rouletteObjects, roulette)
     end
 
+end
+
+local function loadingThread()
+    print('Loading roulette')
+    exports.gl_utils:loadAnimDicts(dealersAnimDicts)
+    exports.gl_utils:loadAnimDicts(tableAnimDict)
+    exports.gl_utils:loadAnimDicts(playerAnimDict)
+
+    rouletteDealers = {}
+    CreateDealer()
+
+    rouletteObjects = {}
+    CreateRoulette()
+end
+
+function startRoulette()
+    Citizen.CreateThread(loadingThread)
+end
+
+function stopRoulette()
+    print('Clearing roulette peds and objects')
+    for k,v in ipairs(rouletteDealers) do
+        DeleteEntity(v)
+    end
+
+    for k,v in ipairs(rouletteObjects) do
+        DeleteEntity(v)
+    end
 end
 
 

@@ -201,16 +201,17 @@ function clientPlaySlots(src, id, event)
         end
     end
 
+    local won = 0
     if winningSymbol then
         local multiplier = symbolMultiplier[winningSymbol]
-        local won = bet*multiplier
+        won = bet*multiplier
 
         slotMachine.paid = slotMachine.paid + won
 
         print("SlotMachine won", slotMachine.id, won)
     end
 
-    BroadcastCasinoEvent('gl_casino:cl:slots', id, 'stopSpinning', reel1, reel2, reel3)
+    BroadcastCasinoEvent('gl_casino:cl:slots', id, 'stopSpinning', reel1, reel2, reel3, winningSymbol, won)
 end
 
 function clientEnterSlots(src, id, event)

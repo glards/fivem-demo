@@ -80,18 +80,24 @@ function enterCasino()
     end
 
     TriggerServerEvent('gl_casino:playerEnterCasino')
+    
     startWallVideo()
     startSlotMachines()
     startLuckyWheel()
+    startBlackjack()
+    -- startRoulette()
 end
 
 function leaveCasino()
     print("Leaving casino")
 
     TriggerServerEvent('gl_casino:playerLeaveCasino')
+
     stopWallVideo()
     stopSlotMachines()
     stopLuckyWheel()
+    stopBlackjack()
+    -- stopRoulette()
 end
 
 local running = false
@@ -183,3 +189,284 @@ end
 RegisterCommand('bigwin', function(source, args, rawCommand)
     showBigWin = true
 end, false)
+
+
+local dealerVariations = {
+    -- Variation 0
+    {
+        {3,0,0},
+        {1,0,0},
+        {3,0,0},
+        {1,0,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {3,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0}
+    },
+
+    -- Variation 1
+    {
+        {2,2,0},
+        {1,0,0},
+        {4,0,0},
+        {0,3,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+    },
+
+    -- Variation 2
+    {
+        {2,1,0},
+        {1,0,0},
+        {2,0,0},
+        {0,3,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+    },
+
+    -- Variation 3
+    {
+        {2,0,0},
+        {1,0,0},
+        {3,0,0},
+        {1,3,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {3,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+    },
+
+    -- Variation 4
+    {
+        {4,2,0},
+        {1,0,0},
+        {3,0,0},
+        {0,0,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+    },
+
+    -- Variation 5
+    {
+        {4,0,0},
+        {1,0,0},
+        {0,0,0},
+        {0,0,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+    },
+
+    -- Variation 6
+    {
+        {4,1,0},
+        {1,0,0},
+        {4,0,0},
+        {1,0,0},
+        {0,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {3,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+    },
+
+    -- Variation 7
+    {
+        {1,1,0},
+        {0,0,0},
+        {1,0,0},
+        {0,3,0},
+        {0,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+        {0,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+
+    -- Variation 8
+    {
+        {1,1,0},
+        {0,0,0},
+        {1,1,0},
+        {1,3,0},
+        {0,0,0},
+        nil,
+        {0,0,0},
+        {2,0,0},
+        {1,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+
+    -- Variation 9
+    {
+        {2,0,0},
+        {0,0,0},
+        {2,0,0},
+        {1,3,0}, -- should be {2,3,0} but then the arm are transparent ?
+        {0,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+        {2,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+
+    -- Variation 10
+    {
+        {2,1,0},
+        {0,0,0},
+        {2,1,0},
+        {1,3,0}, -- should be {3,3,0} but then arm are transparent ?
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {3,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+
+    -- Variation 11
+    {
+        {3,0,0},
+        {0,0,0},
+        {3,0,0},
+        {0,1,0},
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+        {0,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+
+    -- Variation 12
+    {
+        {3,1,0},
+        {0,0,0},
+        {3,1,0},
+        {1,1,0},
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {2,0,0},
+        {1,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+
+    -- Variation 13
+    {
+        {4,0,0},
+        {0,0,0},
+        {4,0,0},
+        {1,1,0}, -- should be {2,1,0} but then arm are transparent ?
+        {1,0,0},
+        nil,
+        {1,0,0},
+        {1,0,0},
+        {2,0,0},
+        nil,
+        {0,0,0},
+        {0,0,0},
+    },
+}
+
+local dealers = {
+    `S_M_Y_Casino_01`,
+    `s_f_y_casino_01`
+}
+
+function CreateDealerPed(pos, heading, dealerGenre)
+    if dealerGenre == nil then
+        dealerGenre = math.random(1,2)
+    end
+
+    RequestModel(dealers[dealerGenre])
+    while not HasModelLoaded(dealers[dealerGenre]) do
+        Citizen.Wait(0)
+    end
+
+    local ped = CreatePed(26, dealers[dealerGenre], pos, heading, false, true)
+    SetEntityCanBeDamaged(ped, false)
+    SetPedAsEnemy(ped, false)
+    SetBlockingOfNonTemporaryEvents(ped, true)
+    SetPedResetFlag(ped, 249, true)
+    SetPedConfigFlag(ped, 185, true)
+    SetPedConfigFlag(ped, 108, true)
+    Citizen.InvokeNative(0x352E2B5CF420BF3B, ped, 1)
+    SetPedCanEvasiveDive(ped, false)
+    Citizen.InvokeNative(0x2F3C3D9F50681DE4, ped, true)
+    SetPedCanRagdollFromPlayerImpact(ped, false)
+    SetPedConfigFlag(ped, 208, true)
+    SetEntityAsMissionEntity(ped, true, false)
+
+    local variationIndex = math.random(0,6)
+    if dealerGenre == 2 then
+        variationIndex = variationIndex + 7
+    end
+
+    local setPropIndex = false
+    if variationIndex == 11 or variationIndex == 13 then
+        setPropIndex = true
+    end
+
+    local variation = dealerVariations[variationIndex+1]
+    SetPedDefaultComponentVariation(ped)
+    for k,v in ipairs(variation) do
+        if v ~= nil then
+            SetPedComponentVariation(ped, k-1, v[1], v[2], v[3])
+        end
+    end
+
+    if setPropIndex then
+        SetPedPropIndex(ped, 1,0,0,false)
+    end
+
+    return ped
+end

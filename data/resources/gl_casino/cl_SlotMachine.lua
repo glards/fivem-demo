@@ -4,7 +4,7 @@ local reelStartPos = 15
 SlotMachine = { }
 
 function SlotMachine:new(id, pos, seatPos, type, reelHash)
-    o = {id = id, pos = pos, seatPos = seatPos, type = type, reelHash = reelHash}
+    local o = {id = id, pos = pos, seatPos = seatPos, type = type, reelHash = reelHash}
     setmetatable(o, self)
     self.__index = self
     o.reels = {}
@@ -66,12 +66,14 @@ function SlotMachine:startSpinning()
     PlaySoundFromCoord(-1, sound, self.pos.x, self.pos.y, self.pos.z, soundRef, true, 50.0, false)
 end
 
-function SlotMachine:stopSpinning(reel1, reel2, reel3)
+function SlotMachine:stopSpinning(reel1, reel2, reel3, cb)
     self.reels[1].endPos = reel1
     self.reels[2].endPos = reel2
     self.reels[3].endPos = reel3
 
     self.fixing = 1
+
+    self.stopCb = cb
 end
 
 function clamp(v, min, max)
@@ -137,6 +139,10 @@ function SlotMachine:animate(gameTimer)
         if reel.spinning then
             stillSpinning = true
         end
+    end
+
+    if self.spinning == true and stillSpinning == false and self.stopCb then
+        self.stopCb()
     end
 
     self.spinning = stillSpinning

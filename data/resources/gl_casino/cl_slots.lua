@@ -241,7 +241,7 @@ local function streamAssets()
     exports.gl_utils:loadModels(machinesSlotWheelHashes)
     exports.gl_utils:loadAnimDicts(animDicts)
     RequestScriptAudioBank("dlc_vinewood\\casino_general")
-    RequestScriptAudioBank("dlc_vinewood\\casino_interior_stems")
+    -- RequestScriptAudioBank("dlc_vinewood\\casino_interior_stems")
     RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_01")
     RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_02")
     RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_03")
@@ -251,7 +251,7 @@ end
 local function playerThread()
     local ped = PlayerPedId()
     
-    --StartAudioScene("dlc_vw_casino_slot_machines_playing")
+    StartAudioScene("dlc_vw_casino_slot_machines_playing")
 
     currentState = Slots_InsideCasino
 
@@ -568,25 +568,14 @@ RegisterCommand('reelIndex', function(source, args, rawCommand)
     reelIndex = idx
 end, false)
 
-RegisterNetEvent('gl_casino:cl:slots', function (id, event, arg1, arg2, arg3)
-    if event == 'startSpinning' then
-        slotsStartSpinning(id)
-    elseif event == 'stopSpinning' then
-        slotsStopSpinning(id, arg1, arg2, arg3)
-    elseif event == 'setOccupied' then
-        slotsSetOccupied(id, arg1)
-    elseif event == 'reset' then
-        slotsReset()
-    end
-end)
 
-function slotsReset()
+local function slotsReset()
     local ped = PlayerPedId()
     ClearPedTasksImmediately(ped)
     currentState = Slots_InsideCasino
 end
 
-function slotsSetOccupied(id, occupied)
+local function slotsSetOccupied(id, occupied)
     if id > #slotMachineInstances or id < 1 then
         return
     end
@@ -594,7 +583,7 @@ function slotsSetOccupied(id, occupied)
     slotMachine.occupied = occupied
 end
 
-function slotsStartSpinning(id)
+local function slotsStartSpinning(id)
     if id > #slotMachineInstances or id < 1 then
         return
     end
@@ -602,10 +591,31 @@ function slotsStartSpinning(id)
     slotMachine:startSpinning()
 end
 
-function slotsStopSpinning(id, reel1, reel2, reel3)
+local function slotsStopSpinning(id, reel1, reel2, reel3, won, amount)
     if id > #slotMachineInstances or id < 1 then
         return
     end
     local slotMachine = slotMachineInstances[id]
-    slotMachine:stopSpinning(reel1, reel2, reel3)
+    slotMachine:stopSpinning(reel1, reel2, reel3, function ()
+        if usedSlotmachine.id ~= id then
+            return
+        end
+        if won then
+            exports.gl_utils:addFeedNotification('Bravo ! Tu as gagné ~g~'..amount..'$~s~', 210, false)
+        else
+            exports.gl_utils:addFeedNotification('Perdu ! Plus de chance la prochaine fois', 6, false)
+        end
+    end)
 end
+
+RegisterNetEvent('gl_casino:cl:slots', function (id, event, arg1, arg2, arg3, arg4, arg5)
+    if event == 'startSpinning' then
+        slotsStartSpinning(id)
+    elseif event == 'stopSpinning' then
+        slotsStopSpinning(id, arg1, arg2, arg3, arg4, arg5)
+    elseif event == 'setOccupied' then
+        slotsSetOccupied(id, arg1)
+    elseif event == 'reset' then
+        slotsReset()
+    end
+end)
