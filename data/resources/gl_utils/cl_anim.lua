@@ -54,10 +54,13 @@ function playNetworkSynchronizedScene(ped, animDict, anim, pos, rot, holdLastFra
 
     NetworkStartSynchronisedScene(sceneId)
 
-    local duration = GetAnimDuration(animDict, anim)
+    local d = GetAnimDuration(animDict, anim)
+    if playbackRate < 3.0 then
+        d = d/playbackRate
+    end
 
     Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
+        Citizen.Wait(d*1000.0)
         p:resolve()
     end)
 
@@ -75,6 +78,9 @@ function playNetworkSynchronizedSceneWithObject(ped, objectHash, objectAnim, ani
     NetworkStartSynchronisedScene(sceneId)
 
     local duration = GetAnimDuration(animDict, anim)
+    if playbackRate < 3.0 then
+        duration = duration/playbackRate
+    end
 
     Citizen.CreateThread(function ()
         Citizen.Wait(duration*1000.0)
@@ -102,25 +108,39 @@ function playSynchronizedScene(ped, animDict, anim, pos, rot, holdLastFrame, loo
 end
 
 function loadModels(models)
-    for i=1,#models do
-        local hash = models[i]
-        if hash ~= nil then
-            RequestModel(hash)
-            while not HasModelLoaded(hash) do
-                Citizen.Wait(0)
+    if type(models) == "table" then
+        for i=1,#models do
+            local hash = models[i]
+            if hash ~= nil then
+                RequestModel(hash)
+                while not HasModelLoaded(hash) do
+                    Citizen.Wait(0)
+                end
             end
+        end
+    elseif type(models) == "string" then
+        RequestModel(models)
+        while not HasModelLoaded(models) do
+            Citizen.Wait(0)
         end
     end
 end
 
 function loadAnimDicts(dicts)
-    for i=1,#dicts do
-        local dict = dicts[i]
-        if dict ~= nil then            
-            RequestAnimDict(dict)
-            while not HasAnimDictLoaded(dict) do
-                Citizen.Wait(0)
+    if type(dicts) == "table" then
+        for i=1,#dicts do
+            local dict = dicts[i]
+            if dict ~= nil then
+                RequestAnimDict(dict)
+                while not HasAnimDictLoaded(dict) do
+                    Citizen.Wait(0)
+                end
             end
+        end
+    elseif type(dicts) == "string" then
+        RequestAnimDict(dicts)
+        while not HasAnimDictLoaded(dicts) do
+            Citizen.Wait(0)
         end
     end
 end
@@ -130,6 +150,6 @@ exports('playAnim', playAnim)
 exports('playAnimWithPos', playAnimWithPos)
 exports('playNetworkSynchronizedScene', playNetworkSynchronizedScene)
 exports('playNetworkSynchronizedSceneWithObject', playNetworkSynchronizedSceneWithObject)
-exports('playSynchronizedScene', playSynchronizedScene)
+--exports('playSynchronizedScene', playSynchronizedScene)
 exports('loadModels', loadModels)
 exports('loadAnimDicts', loadAnimDicts)
