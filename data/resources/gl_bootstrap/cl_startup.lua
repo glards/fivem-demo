@@ -44,7 +44,7 @@ function ClientThread()
             local cameraRotation = GetGameplayCamRot()
             local cameraCoord = GetGameplayCamCoord()
             
-            local cameraRotationRad = math.rad(cameraRotation)
+            local cameraRotationRad = vector3(math.rad(cameraRotation.x), math.rad(cameraRotation.y), math.rad(cameraRotation.z))
 
             local camForwardVec = norm(vector3(
                 -math.sin(cameraRotationRad.z)*math.abs(math.cos(cameraRotationRad.x)),
