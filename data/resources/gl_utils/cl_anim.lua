@@ -18,12 +18,13 @@ end
 function playAnim(ped, animDict, anim, flag)
     local p = promise.new()
 
-    local duration = GetAnimDuration(animDict, anim)
-
     TaskPlayAnim(ped, animDict, anim, 8.0, 1.0, -1, flag, 0.0, 1.0, 0.0, 1.0)
 
     Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
+        Citizen.Wait(100)
+        while not isAnimFinished(ped, animDict, anim) do
+            Citizen.Wait(100)
+        end
         p:resolve()
     end)
 
@@ -33,16 +34,45 @@ end
 function playAnimWithPos(ped, animDict, anim, pos, rot, flag)
     local p = promise.new()
 
-    local duration = GetAnimDuration(animDict, anim)
-
     TaskPlayAnimAdvanced(ped, animDict, anim, pos, rot, 8.0, 1.0, -1, flag, 0.0, 1.0, 0.0, 1.0)
 
     Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
+        Citizen.Wait(100)
+        while not isAnimFinished(ped, animDict, anim) do
+            Citizen.Wait(100)
+        end
         p:resolve()
     end)
 
     return p
+end
+
+function animDebug(frame, ped, animDict, anim)
+    local entityPlayingAnim = IsEntityPlayingAnim(ped, animDict, anim, 3)
+    local hasEntityAnimFinished = HasEntityAnimFinished(ped, animDict, anim, 3)
+    local currentTime = GetEntityAnimCurrentTime(ped, animDict, anim)
+    local totalTime = GetEntityAnimTotalTime(ped, animDict, anim)
+    print("---------- Start frame", frame ,"------------")
+    print("IsEntityPlayingAnim", entityPlayingAnim)
+    print("HasEntityAnimFinished", hasEntityAnimFinished)
+    print("GetEntityAnimCurrentTime", currentTime)
+    print("GetEntityAnimTotalTime", totalTime)
+    print("---------- End frame", frame ,"------------")
+end
+
+function isAnimFinished(ped, animDict, anim)
+    local entityPlayingAnim = IsEntityPlayingAnim(ped, animDict, anim, 3)
+    local hasEntityAnimFinished = HasEntityAnimFinished(ped, animDict, anim, 3)
+
+    if entityPlayingAnim and hasEntityAnimFinished then
+        return true
+    end
+
+    if not entityPlayingAnim and not hasEntityAnimFinished then
+        return true
+    end
+
+    return false
 end
 
 
@@ -54,13 +84,11 @@ function playNetworkSynchronizedScene(ped, animDict, anim, pos, rot, holdLastFra
 
     NetworkStartSynchronisedScene(sceneId)
 
-    local d = GetAnimDuration(animDict, anim)
-    if playbackRate < 3.0 then
-        d = d/playbackRate
-    end
-
     Citizen.CreateThread(function ()
-        Citizen.Wait(d*1000.0)
+        Citizen.Wait(100)
+        while not isAnimFinished(ped, animDict, anim) do
+            Citizen.Wait(100)
+        end
         p:resolve()
     end)
 
@@ -77,13 +105,11 @@ function playNetworkSynchronizedSceneWithObject(ped, objectHash, objectAnim, ani
 
     NetworkStartSynchronisedScene(sceneId)
 
-    local duration = GetAnimDuration(animDict, anim)
-    if playbackRate < 3.0 then
-        duration = duration/playbackRate
-    end
-
     Citizen.CreateThread(function ()
-        Citizen.Wait(duration*1000.0)
+        Citizen.Wait(100)
+        while not isAnimFinished(ped, animDict, anim) do
+            Citizen.Wait(100)
+        end
         p:resolve()
     end)
 
