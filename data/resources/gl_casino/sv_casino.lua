@@ -48,3 +48,19 @@ AddEventHandler('playerDropped', function (reason)
     slotsPlayerLeft(src)
     luckywheelPlayerLeft(src)
 end)
+
+AddEventHandler('onResourceStart', function(resource)
+    if resource ~= GetCurrentResourceName() then
+        return
+    end
+
+    startBlackjack()
+end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then
+        return
+    end
+
+    stopBlackjack()
+end)

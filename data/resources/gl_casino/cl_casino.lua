@@ -422,9 +422,13 @@ local dealers = {
     `s_f_y_casino_01`
 }
 
-function CreateDealerPed(pos, heading, dealerGenre)
-    if dealerGenre == nil then
-        dealerGenre = math.random(1,2)
+function CreateDealerPed(pos, heading, dealerType)
+
+    assert(dealerType >= 1 and dealerType <= 14, "dealerType should be betweeen 1 and 14")
+
+    local dealerGenre = 1
+    if dealerType >= 7 then
+        dealerGenre = 2
     end
 
     RequestModel(dealers[dealerGenre])
@@ -446,17 +450,14 @@ function CreateDealerPed(pos, heading, dealerGenre)
     SetPedConfigFlag(ped, 208, true)
     SetEntityAsMissionEntity(ped, true, false)
 
-    local variationIndex = math.random(0,6)
-    if dealerGenre == 2 then
-        variationIndex = variationIndex + 7
-    end
+    local variationIndex = dealerType
 
     local setPropIndex = false
-    if variationIndex == 11 or variationIndex == 13 then
+    if variationIndex == 12 or variationIndex == 14 then
         setPropIndex = true
     end
 
-    local variation = dealerVariations[variationIndex+1]
+    local variation = dealerVariations[variationIndex]
     SetPedDefaultComponentVariation(ped)
     for k,v in ipairs(variation) do
         if v ~= nil then
