@@ -588,3 +588,32 @@ else if (ENTITY::IS_ENTITY_ATTACHED(Local_2041.f_603[iVar13]))
 	ENTITY::SET_ENTITY_ROTATION(Local_2041.f_603[iVar13], Var15 + func_382(iVar12, bVar25), 2, true);
 }
 
+-- anim event : Attach card -> -1345695206
+-- anim event : Detach card -> 585557868
+
+-- retrieve player cards
+if ((((iVar18 == 0 && ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_7(iVar7), 3)) || (iVar18 == 1 && ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_6(iVar7), 3))) || (iVar18 == 2 && ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_5(iVar7), 3))) || (iVar18 == 3 && ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_4(iVar7), 3)))
+{
+	if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), -1345695206))
+
+
+-- split player cards
+if (((NETWORK::NETWORK_DOES_ENTITY_EXIST_WITH_NETWORK_ID(Local_124.f_1595[iVar7]) && !PED::IS_PED_INJURED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]))) && !ENTITY::IS_ENTITY_ATTACHED_TO_ANY_PED(Local_2041.f_648[iVar13])) && ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), -1345695206))
+{
+	if (ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_22(iVar7, iVar18), 3))
+	{
+		ENTITY::ATTACH_ENTITY_TO_ENTITY(Local_2041.f_648[iVar13], NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), PED::GET_PED_BONE_INDEX(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 60309), 0f, 0f, 0f, 0f, 0f, 0f, false, false, false, true, 2, true);
+	}
+	else
+	{
+		ENTITY::ATTACH_ENTITY_TO_ENTITY(Local_2041.f_648[iVar13], NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), PED::GET_PED_BONE_INDEX(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), 28422), 0f, 0f, 0f, 0f, 0f, 0f, false, false, false, true, 2, true);
+	}
+}
+
+
+-- retrieve own cards and remove
+if (ENTITY::IS_ENTITY_PLAYING_ANIM(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), func_58(), func_3(iVar7), 3))
+{
+	if (ENTITY::HAS_ANIM_EVENT_FIRED(NETWORK::NET_TO_PED(Local_124.f_1595[iVar7]), -1345695206))
+
+
