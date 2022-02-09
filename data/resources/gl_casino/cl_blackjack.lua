@@ -206,6 +206,7 @@ function Blackjack_BetRound(ped, coords, timer)
 
     local betPressed = IsControlJustPressed(0, INPUT_TALK)
     if betPressed then
+        TriggerServerEvent("gl_casino:bj:playerBetRound", usedBlackjackTable.id, seatIndex)
         playerRoundActive = false
         currentState = Blackjack_PlayerRound
         return
@@ -213,6 +214,7 @@ function Blackjack_BetRound(ped, coords, timer)
 
     local skipPressed = IsControlJustPressed(0, INPUT_RELOAD)
     if skipPressed then
+        TriggerServerEvent("gl_casino:bj:playerSkipRound", usedBlackjackTable.id, seatIndex)
         playerRoundActive = false
         currentState = Blackjack_PlayerRound
         return
@@ -244,12 +246,16 @@ function Blackjack_PlayerRound(ped, coords, timer)
     if playerRoundActive then
         local hitCard = IsControlJustPressed(0, INPUT_TALK)
         if hitCard then
-            
+            TriggerServerEvent("gl_casino:bj:playerHitCard", usedBlackjackTable.id, seatIndex)
+            playerRoundActive = false
+            return
         end
 
         local stand = IsControlJustPressed(0, INPUT_RELOAD)
         if stand then
-            
+            TriggerServerEvent("gl_casino:bj:playerStand", usedBlackjackTable.id, seatIndex)
+            playerRoundActive = false
+            return
         end
     end
 

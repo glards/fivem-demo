@@ -15,7 +15,7 @@ local blackjackValue = {
     10
 }
 
-function blackjackValue(cards)
+function getBlackjackValue(cards)
     local value = 0
     local aceCount = 0
     for k,v in pairs(cards) do

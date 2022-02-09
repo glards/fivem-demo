@@ -168,6 +168,15 @@ function BlackjackTable:createDealer()
     end
 end
 
+function BlackjackTable:hasFreeSeats()
+    for k,v in pairs(self.seatsOccupied) do
+        if not v then
+            return true
+        end
+    end
+    return false
+end
+
 -- Code to get the location
 -- local obj = GetClosestObjectOfType(pos, 1.0, v.modelHash, false, false, false)
 -- if DoesEntityExist(obj) and DoesEntityHaveDrawable(obj) then
@@ -200,12 +209,10 @@ end
 -- end
 
 function BlackjackTable:dealCards(dealResult)
-    local cardPerSeat = {}
-
     for k,v in pairs(dealResult) do
-        local cardIdx = cardPerSeat[v.seatId] or 1
+        local cardIdx = self.cardStack[v.seatId] or 1
         self:dealCard(v.seatId, cardIdx, v.card)
-        cardPerSeat[v.seatId] = cardIdx + 1
+        self.cardStack[v.seatId] = cardIdx + 1
     end
 end
 
