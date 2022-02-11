@@ -330,3 +330,23 @@ local function blackjackPlayerRoundState(isActive)
     playerRoundActive = isActive
 end
 RegisterNetEvent("gl_casino:bj:playerRound", blackjackPlayerRoundState)
+
+local function blackjackCheckCards(tableId)
+    local t = tables[tableId]
+    if t == nil then
+        return
+    end
+
+    t:dealerCheckCard()
+end
+RegisterNetEvent("gl_casino:bj:checkCards", blackjackCheckCards)
+
+local function blackjackRemoveCards(tableId)
+    local t = tables[tableId]
+    if t == nil then
+        return
+    end
+
+    t:removeCards()
+end
+RegisterNetEvent("gl_casino:bj:removeCards", blackjackRemoveCards)

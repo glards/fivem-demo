@@ -16,6 +16,8 @@ local ROUND = {
 }
 
 local CARD_DELAY = 3500
+local CHECK_DELAY = 4000
+local REMOVE_DELAY = 3500
 local BET_ROUND_TIMEOUT = 25000
 local PLAYER_ROUND_TIMEOUT = 15000
 
@@ -114,7 +116,7 @@ local function betRoundTick(t)
         if playerRoundDone > 0 then
             t.state = STATES.DEAL_CARDS
         else
-            t.state = STATES.WAITING_PLAYER 
+            t.state = STATES.WAITING_PLAYER
         end
         return
     end
@@ -126,7 +128,7 @@ local function betRoundTick(t)
         if playerRoundDone > 0 then
             t.state = STATES.DEAL_CARDS
         else
-            t.state = STATES.WAITING_PLAYER 
+            t.state = STATES.WAITING_PLAYER
         end
         return
     end
@@ -277,10 +279,44 @@ end
 
 local function dealerRoundTick(t)
     -- Dealer check his card
+    BroadcastCasinoEvent("gl_casino:bj:checkCards", t.id)
+
+    Citizen.Wait(CHECK_DELAY)
 
     -- Dealer stand on 17 or more, so draw cards until we hit at least 17 or bust
 
+    local drawnCards = 0
+    local dealResult = {}
+    local dealerValue = getBlackjackValue(t.dealerCards)
+    print(string.format("Table %d dealer has hand value %d", t.id, dealerValue))
+    while dealerValue < 17 do
+        local card = drawCard(t.deck)
+        table.insert(t.dealerCards, card)
+        table.insert(dealResult, { seatId = 0, card = card})
+        drawnCards = drawnCards + 1
+        dealerValue = getBlackjackValue(t.dealerCards)
+        print(string.format("Table %d dealer has hand value %d", t.id, dealerValue))
+    end
+
+    if drawnCards > 0 then
+        BroadcastCasinoEvent("gl_casino:bj:dealCards", t.id, dealResult)
+        Citizen.Wait(drawnCards * CARD_DELAY)
+    end
+
     -- Check players win and hand out payouts
+
+    -- Remove the cards from the field
+    local seatsCount = 1
+    
+    for k,v in pairs(t.seats) do
+        if v.participantPed then
+            seatsCount = seatsCount + 1
+        end
+    end
+
+    BroadcastCasinoEvent("gl_casino:bj:removeCards", t.id)
+
+    Citizen.Wait(seatsCount * REMOVE_DELAY)
     
     t.state = STATES.WAITING_PLAYER
 end
@@ -352,6 +388,10 @@ local function playerLeaveTable(tableId, seatId)
     end
 
     print(string.format("Player %d left table %d from seat %d", src, tableId, seatId))
+
+    if seat.roundState == ROUND.BET then
+        seat.roundState = ROUND.DONE
+    end
 
     seat.occupied = false
     seat.ped = nil

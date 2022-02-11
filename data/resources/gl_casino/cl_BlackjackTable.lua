@@ -49,6 +49,48 @@ local dealerAnims = {
             'deal_card_player_04',
             'female_deal_card_player_04'
         }
+    },
+    CheckAndTurnCard = {
+        dict = dealerBlackjackDict,
+        anims = {
+            'check_and_turn_card',
+            'female_check_and_turn_card'
+        }
+    },
+    RetrieveCard1 = {
+        dict = dealerBlackjackDict,
+        anims = {
+            'retrieve_cards_player_01',
+            'female_retrieve_cards_player_01'
+        }
+    },
+    RetrieveCard2 = {
+        dict = dealerBlackjackDict,
+        anims = {
+            'retrieve_cards_player_02',
+            'female_retrieve_cards_player_02'
+        }
+    },
+    RetrieveCard3 = {
+        dict = dealerBlackjackDict,
+        anims = {
+            'retrieve_cards_player_03',
+            'female_retrieve_cards_player_03'
+        }
+    },
+    RetrieveCard4 = {
+        dict = dealerBlackjackDict,
+        anims = {
+            'retrieve_cards_player_04',
+            'female_retrieve_cards_player_04'
+        }
+    },
+    RetrieveOwnCardAndRemove = {
+        dict = dealerBlackjackDict,
+        anims = {
+            'retrieve_own_cards_and_remove',
+            'female_retrieve_own_cards_and_remove'
+        }
     }
 }
 
@@ -209,6 +251,8 @@ end
 -- end
 
 function BlackjackTable:dealCards(dealResult)
+    self.cardStack = self.cardStack or {}
+
     for k,v in pairs(dealResult) do
         local cardIdx = self.cardStack[v.seatId] or 1
         self:dealCard(v.seatId, cardIdx, v.card)
@@ -235,7 +279,7 @@ end
 
 function BlackjackTable:dealCard(seatId, cardIdx, card)
     assert(seatId >= 0 and seatId <= 4)
-    assert(cardIdx >= 1 and cardIdx <= 2)
+    assert(cardIdx >= 1 and cardIdx <= 7)
 
     local animMap = {
         [1] = dealerAnims.DealCardPalyer1,
@@ -270,6 +314,10 @@ function BlackjackTable:dealCard(seatId, cardIdx, card)
     local cardEntity = CreateObjectNoOffset(cardModel, cardShufflerPos, false, false, true)
     SetEntityRotation(cardEntity, shufflerRot, 2, true)
 
+    self.seatCardEntities = self.seatCardEntities or {}
+    self.seatCardEntities[seatId] = self.seatCardEntities[seatId] or {}
+    table.insert(self.seatCardEntities[seatId], cardEntity)
+
     local attached = false
     local detached = false
     self:dealerAnim(anim, function (ped, dict, anim)
@@ -285,6 +333,75 @@ function BlackjackTable:dealCard(seatId, cardIdx, card)
     end)
 end
 
+function BlackjackTable:dealerCheckCard()
+    local seatId = 0
+    local cardIdx = 1
+    local offset = dealerCardOffset[cardIdx]
+
+    local cardPos = GetObjectOffsetFromCoords(self.pos.xyz, self.pos.w, offset.xyz)
+    local cardRot = vector3(0.0, 0.0, self.pos.w) + vector3(0.0, 0.0, offset.w)
+
+    local cardEntity = self.seatCardEntities[seatId][cardIdx]
+
+    local attached = false
+    local detached = false
+    self:dealerAnim(dealerAnims.CheckAndTurnCard, function (ped, dict, anim)
+        if HasAnimEventFired(ped, AnimEvents.ATTACH_CARD) and not attached then
+            AttachEntityToEntity(cardEntity, ped, GetPedBoneIndex(ped, 28422), vector3(0.0, 0.0, 0.0), vector3(0.0, 0.0, 0.0), false, false, false, true, 2, true)
+            attached = true
+        elseif HasAnimEventFired(ped, AnimEvents.DETACH_CARD) and not detached then
+            detached = true
+            DetachEntity(cardEntity, false, true)
+            SetEntityCoordsNoOffset(cardEntity, cardPos, false, false, true)
+            SetEntityRotation(cardEntity, cardRot, 2, true)
+        end
+    end)
+end
+
+function BlackjackTable:removeCards()
+    local animMap = {
+        [1] = dealerAnims.RetrieveCard1,
+        [2] = dealerAnims.RetrieveCard2,
+        [3] = dealerAnims.RetrieveCard3,
+        [4] = dealerAnims.RetrieveCard4
+    }
+
+    for i = 1, 4 do
+        local cardsEntities = self.seatCardEntities[i] or {}
+
+        if #cardsEntities > 0 then
+            self:dealerAnim(animMap[i], function (ped, dict, anim)
+                if HasAnimEventFired(ped, AnimEvents.ATTACH_CARD) then
+                    for k,v in pairs(cardsEntities) do
+                        AttachEntityToEntity(v, ped, GetPedBoneIndex(ped, 28422), vector3(0.0, 0.0, 0.0), vector3(0.0, 0.0, 0.0), false, false, false, true, 2, true) 
+                    end
+                elseif HasAnimEventFired(ped, AnimEvents.DETACH_CARD) then
+                    for k,v in pairs(cardsEntities) do
+                        DetachEntity(v, false, true)
+                        DeleteEntity(v)
+                    end
+                end
+            end)
+        end
+    end
+
+    self:dealerAnim(dealerAnims.RetrieveOwnCardAndRemove, function (ped, dict, anim)
+        if HasAnimEventFired(ped, AnimEvents.ATTACH_CARD) then
+            for k,v in pairs(self.seatCardEntities[0]) do
+                AttachEntityToEntity(v, ped, GetPedBoneIndex(ped, 28422), vector3(0.0, 0.0, 0.0), vector3(0.0, 0.0, 0.0), false, false, false, true, 2, true) 
+            end
+            AttachEntityToEntity(cardEntity, ped, GetPedBoneIndex(ped, 28422), vector3(0.0, 0.0, 0.0), vector3(0.0, 0.0, 0.0), false, false, false, true, 2, true)
+        elseif HasAnimEventFired(ped, AnimEvents.DETACH_CARD) then
+            for k,v in pairs(self.seatCardEntities[0]) do
+                DetachEntity(v, false, true)
+                DeleteEntity(v)
+            end
+        end
+    end)
+
+    self.seatCardEntities = {}
+end
+
 function BlackjackTable:dispose()
     DeleteEntity(self.dealerPed)
 
@@ -292,45 +409,3 @@ function BlackjackTable:dispose()
     self.dealerPos = nil
     self.dealerGenre = nil
 end
-
--- -- Dealer cards
--- do
---     local offset = dealerCardOffset[1]
---     local card = cards[math.random(1, #cards)]
---     local cardPos = GetObjectOffsetFromCoords(v.pos.xyz, v.pos.w, offset.xyz)
---     local cardEntity = CreateObjectNoOffset(card, cardPos, false, false, true)
---     SetEntityRotation(cardEntity, vector3(0.0, 0.0, v.pos.w) + vector3(0.0, 0.0, offset.w), 2, true)
--- end
--- do
---     local offset = dealerCardOffset[2]
---     local card = cards[math.random(1, #cards)]
---     local cardPos = GetObjectOffsetFromCoords(v.pos.xyz, v.pos.w, offset.xyz)
---     local cardEntity = CreateObjectNoOffset(card, cardPos, false, false, true)
---     SetEntityRotation(cardEntity, vector3(0.0, 0.0, v.pos.w) + vector3(0.0, 0.0, offset.w), 2, true)
--- end
-
--- -- Cards on table
--- for _, cardOffset in pairs(cardsOffset) do
---     for _, offset in pairs(cardOffset) do
---         local card = cards[math.random(1, #cards)]
---         local cardPos = GetObjectOffsetFromCoords(v.pos.xyz, v.pos.w, offset.xyz)
---         local cardEntity = CreateObjectNoOffset(card, cardPos, false, false, true)
---         SetEntityRotation(cardEntity, vector3(0.0, 0.0, v.pos.w) + vector3(0.0, 0.0, offset.w), 2, true)
---     end
--- end
-
--- do
---     local offset = vector4(0.0, 0.0, 1.0, 0.0)
---     local card = cards[math.random(1, #cards)]
---     local cardPos = GetObjectOffsetFromCoords(v.pos.xyz, v.pos.w, offset.xyz)
---     local cardEntity = CreateObjectNoOffset(card, cardPos, false, false, true)
---     SetEntityRotation(cardEntity, vector3(0.0, 0.0, v.pos.w) + vector3(0.0, 0.0, offset.w), 2, true)
--- end
-
--- do
---     local offset = vector4(1.0, 0.0, 1.0, 0.0)
---     local card = cards[math.random(1, #cards)]
---     local cardPos = GetObjectOffsetFromCoords(v.pos.xyz, v.pos.w, offset.xyz)
---     local cardEntity = CreateObjectNoOffset(card, cardPos, false, false, true)
---     SetEntityRotation(cardEntity, vector3(0.0, 0.0, v.pos.w) + vector3(0.0, 0.0, offset.w), 2, true)
--- end
