@@ -1,4 +1,9 @@
 
+
+-- Gray : 70
+-- Green : 210
+-- Red : 6
+
 function addFeedNotification(text, color, blink)
 	if color then ThefeedNextPostBackgroundColor(color) end
 	PlaySoundFrontend(-1, "OTHER_TEXT", "HUD_AWARDS", 0)

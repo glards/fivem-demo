@@ -251,12 +251,24 @@ end
 -- end
 
 function BlackjackTable:dealCards(dealResult)
-    self.cardStack = self.cardStack or {}
+    self.hands = self.hands or {}
 
     for k,v in pairs(dealResult) do
-        local cardIdx = self.cardStack[v.seatId] or 1
+        local hand = self.hands[v.seatId] or {}
+        local cardIdx = #hand + 1
         self:dealCard(v.seatId, cardIdx, v.card)
-        self.cardStack[v.seatId] = cardIdx + 1
+        table.insert(hand, v.card)
+        self.hands[v.seatId] = hand
+
+        -- Hide the first card from the dealer
+        if v.seatId == 0 and not self.dealerRevealedCard then
+            if #hand > 1 then
+                local dealerVisibleHand = { hand[2] }
+                TriggerEvent("gl_casino:bj:notifCardDealt", self.id, v.seatId, v.card, dealerVisibleHand)
+            end
+        else
+            TriggerEvent("gl_casino:bj:notifCardDealt", self.id, v.seatId, v.card, hand)
+        end
     end
 end
 
@@ -356,6 +368,10 @@ function BlackjackTable:dealerCheckCard()
             SetEntityRotation(cardEntity, cardRot, 2, true)
         end
     end)
+
+    self.dealerRevealedCard = true
+    
+    TriggerEvent("gl_casino:bj:notifCardDealt", self.id, 0, self.hands[seatId][cardIdx], self.hands[seatId])
 end
 
 function BlackjackTable:removeCards()
@@ -400,6 +416,8 @@ function BlackjackTable:removeCards()
     end)
 
     self.seatCardEntities = {}
+    self.hands = {}
+    self.dealerRevealedCard = false
 end
 
 function BlackjackTable:dispose()

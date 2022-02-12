@@ -122,6 +122,7 @@ function stopBlackjack()
     end
 end
 
+local roundStart = false
 local usedBlackjackTable = nil
 local seatIndex = nil
 local playerRoundActive = false
@@ -188,7 +189,29 @@ function Blackjack_WalkAndSit(ped, coords, timer)
 
     Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim, seatPos.xyz, seatRot, true, false, 2.0, -1.5, 13, 16, 2.0))
     
-    currentState = Blackjack_BetRound
+    currentState = Blackjack_WaitRoundStart
+end
+function Blackjack_WaitRoundStart(ped, coords, timer)
+    local controls = {
+        {control = INPUT_ENTER, name = "Sortir de la table"},
+    }
+
+    local exitPressed = IsControlJustPressed(0, INPUT_ENTER)
+    if exitPressed then
+        currentState = Blackjack_Exit
+        return
+    end
+
+    if usedBlackjackTable == nil then
+        return
+    end
+
+    exports.gl_utils:drawInstructionalButtons(controls)
+
+    if roundStart then
+        currentState = Blackjack_BetRound
+        roundStart = false
+    end
 end
 
 function Blackjack_BetRound(ped, coords, timer)
@@ -316,6 +339,20 @@ local function blackjackTableSeatFreed(tableId, seatId)
 end
 RegisterNetEvent("gl_casino:bj:tableSeatFreed", blackjackTableSeatFreed)
 
+local function blackjackTableRoundStart(tableId)
+    if usedBlackjackTable == nil then
+        return
+    end
+
+    if usedBlackjackTable.id ~= tableId then
+        return
+    end
+
+    print("Starting round on table ", tableId)
+    roundStart = true
+end
+RegisterNetEvent("gl_casino:bj:roundStart", blackjackTableRoundStart)
+
 local function blackjackTableDealResult(tableId, dealResult)
     local t = tables[tableId]
     if t == nil then
@@ -350,3 +387,40 @@ local function blackjackRemoveCards(tableId)
     t:removeCards()
 end
 RegisterNetEvent("gl_casino:bj:removeCards", blackjackRemoveCards)
+
+-- Local notification
+local function blackjackCardDealt(tableId, seatId, card, hand)
+    if not usedBlackjackTable then
+        return
+    end
+
+    if usedBlackjackTable.id ~= tableId then
+        return
+    end
+
+    if seatIndex ~= seatId and seatId ~= 0 then
+        return
+    end
+
+    local handValue = getBlackjackValue(hand)
+    
+    if seatId == 0 then
+        if handValue > 21 then
+            exports.gl_utils:addFeedNotification('Le croupier a reçu la carte ~h~' .. cardName(card) .. '~h~. Sa main vaut ~y~' .. handValue ..'~s~, elle dépasse 21 !', 6, false)
+        elseif handValue == 21 then
+            exports.gl_utils:addFeedNotification('Le croupier a reçu la carte ~h~' .. cardName(card) .. '~h~. Sa main vaut ~y~' .. handValue ..'~s~ ! Blackjack !', 140, false)
+        else
+            exports.gl_utils:addFeedNotification('Le croupier a reçu la carte ~h~' .. cardName(card) .. '~h~. Sa main vaut ~y~' .. handValue ..'~s~ !', 140, false)
+        end
+    else
+        if handValue > 21 then
+            exports.gl_utils:addFeedNotification('Tu as reçu la carte ~h~' .. cardName(card) .. '~h~. Ta main vaut ~y~' .. handValue ..'~s~, elle dépasse 21 !', 6, false)
+        elseif handValue == 21 then
+            exports.gl_utils:addFeedNotification('Tu as reçu la carte ~h~' .. cardName(card) .. '~h~. Ta main vaut ~y~' .. handValue ..'~s~ ! Blackjack !', 120, false)
+        else
+            exports.gl_utils:addFeedNotification('Tu as reçu la carte ~h~' .. cardName(card) .. '~h~. Ta main vaut ~y~' .. handValue ..'~s~ !', 70, false)
+        end
+        
+    end
+end
+AddEventHandler("gl_casino:bj:notifCardDealt", blackjackCardDealt)

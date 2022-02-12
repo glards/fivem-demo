@@ -9,13 +9,14 @@ local STATES = {
 }
 
 local ROUND = {
-    WAIT = 1,
-    BET = 2,
-    SKIP = 3,
-    DONE = 4,
+    NEW = 1,
+    WAIT = 2,
+    BET = 3,
+    SKIP = 4,
+    DONE = 5,
 }
 
-local CARD_DELAY = 3500
+local CARD_DELAY = 3300
 local CHECK_DELAY = 4000
 local REMOVE_DELAY = 3500
 local BET_ROUND_TIMEOUT = 25000
@@ -54,7 +55,7 @@ local function resetTable(t)
     
     for k,v in pairs(t.seats) do
         v.cards = {}
-        v.roundState = ROUND.WAIT
+        v.roundState = ROUND.NEW
         v.participantPed = nil
     end
 end
@@ -90,8 +91,16 @@ end
 local function waitingPlayerTick(t)
     if hasPlayers(t) then
         resetTable(t)
+        print(string.format("Round start on table %d", t.id))
         t.state = STATES.BET_ROUND
         t.betRoundStart = GetGameTimer()
+
+        for k,v in pairs(t.seats) do
+            if v.occupied then
+                v.round = ROUND.WAIT
+                TriggerClientEvent("gl_casino:bj:roundStart", v.ped, t.id)
+            end
+        end
     end
 end
 
@@ -103,6 +112,11 @@ local function betRoundTick(t)
     for k,v in pairs(t.seats) do
         if v.occupied then
             playerCount = playerCount + 1
+
+            if v.roundState == ROUND.NEW then
+                v.roundState = ROUND.WAIT
+                TriggerClientEvent("gl_casino:bj:roundStart", v.ped, t.id)
+            end
 
             if v.roundState ~= ROUND.WAIT then
                 playerRoundDone = playerRoundDone + 1
@@ -229,7 +243,6 @@ local function playerRoundTick(t)
             if cardsValue > 21 then
                 seat.roundState = ROUND.DONE
                 print(string.format("Table %d and seat %d is busted", t.id, deal.seatId))
-                -- TODO : Tell player it is busted
             else
                 table.insert(seatsStillPlaying, seat)
                 print(string.format("Table %d and seat %d is still playing", t.id, deal.seatId))
@@ -284,7 +297,6 @@ local function dealerRoundTick(t)
     Citizen.Wait(CHECK_DELAY)
 
     -- Dealer stand on 17 or more, so draw cards until we hit at least 17 or bust
-
     local drawnCards = 0
     local dealResult = {}
     local dealerValue = getBlackjackValue(t.dealerCards)
@@ -304,6 +316,7 @@ local function dealerRoundTick(t)
     end
 
     -- Check players win and hand out payouts
+    -- TODO
 
     -- Remove the cards from the field
     local seatsCount = 1
@@ -318,6 +331,7 @@ local function dealerRoundTick(t)
 
     Citizen.Wait(seatsCount * REMOVE_DELAY)
     
+    print(string.format("Waiting for player on table %d", t.id))
     t.state = STATES.WAITING_PLAYER
 end
 
@@ -388,6 +402,10 @@ local function playerLeaveTable(tableId, seatId)
     end
 
     print(string.format("Player %d left table %d from seat %d", src, tableId, seatId))
+
+    if seat.roundState ~= ROUND.BET and seat.roundState ~= ROUND.SKIP then
+        seat.roundState = ROUND.SKIP
+    end
 
     if seat.roundState == ROUND.BET then
         seat.roundState = ROUND.DONE
