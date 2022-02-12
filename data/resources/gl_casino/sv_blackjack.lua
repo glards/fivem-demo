@@ -22,10 +22,18 @@ local REMOVE_DELAY = 3500
 local BET_ROUND_TIMEOUT = 25000
 local PLAYER_ROUND_TIMEOUT = 15000
 
+local tableBets = {
+    600,
+    600,
+    1500,
+    1500
+}
+
 for i=1,4 do
     tables[i] = {
         id = i,
         state = STATES.WAITING_PLAYER,
+        bet = tableBets[i],
         deck = {},
         dealerCards = {},
         seats = {
@@ -90,7 +98,6 @@ end
 
 local function waitingPlayerTick(t)
     if hasPlayers(t) then
-        resetTable(t)
         print(string.format("Round start on table %d", t.id))
         t.state = STATES.BET_ROUND
         t.betRoundStart = GetGameTimer()
@@ -253,11 +260,12 @@ local function playerRoundTick(t)
 
         if cardsToDeal then
             print(string.format("Dealing additional cards to table %d", t.id))
+
             -- Send the information to the clients inside the casino
             BroadcastCasinoEvent("gl_casino:bj:dealCards", t.id, dealResult)
-    
+
             Citizen.Wait(drawnCards * CARD_DELAY)
-    
+
             print(string.format("Done dealing additional cards to table %d", t.id))
             local dealTime = GetGameTimer()
             for k,v in pairs(seatsStillPlaying) do
@@ -316,7 +324,29 @@ local function dealerRoundTick(t)
     end
 
     -- Check players win and hand out payouts
-    -- TODO
+    for k,v in pairs(t.seats) do
+        if v.participantPed then
+            local won = false
+            local playerValue = getBlackjackValue(v.cards)
+
+            if playerValue > 21 then
+                won = false
+            elseif dealerValue > 21 then
+                won = true
+            elseif playerValue > dealerValue then
+                won = true
+            end
+
+            local amountWon = 0
+            if won then
+                amountWon = (t.bet*3)/2
+            end
+
+            TriggerClientEvent("gl_casino:bj:roundResult", v.participantPed, t.id, amountWon, playerValue, dealerValue)
+
+            -- TODO : Register payout server side
+        end
+    end
 
     -- Remove the cards from the field
     local seatsCount = 1
@@ -333,6 +363,7 @@ local function dealerRoundTick(t)
     
     print(string.format("Waiting for player on table %d", t.id))
     t.state = STATES.WAITING_PLAYER
+    resetTable(t)
 end
 
 local function tableTick(t)
@@ -426,6 +457,7 @@ local function playerBetRound(tableId, seatId)
         return
     end
 
+    --TODO: Register bet amount (t.bet) server side
     seat.roundState = ROUND.BET
     seat.participantPed = src
     print(string.format("Participate in round for table %d and seat %d", tableId, seatId))
@@ -454,7 +486,6 @@ local function playerStand(tableId, seatId)
         return
     end
 
-    -- End player round
     seat.roundState = ROUND.DONE
     TriggerClientEvent("gl_casino:bj:playerRound", seat.participantPed, false)
     print(string.format("Stand for table %d and seat %d", tableId, seatId))

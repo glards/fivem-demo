@@ -5,6 +5,14 @@ local playerAnimDict = 'anim_casino_b@amb@casino@games@blackjack@player'
 local dealerSharedDict = 'anim_casino_b@amb@casino@games@shared@dealer@'
 local dealerAnimDict = 'anim_casino_b@amb@casino@games@blackjack@dealer'
 
+
+local tableBets = {
+    600,
+    600,
+    1500,
+    1500
+}
+
 local tablesData = {
     [1] = {
         modelHash = `vw_prop_casino_blckjack_01`,
@@ -18,7 +26,8 @@ local tablesData = {
             vector4(1148.075, 269.8671, -52.84095, 335.3093),
             vector4(1148.708, 270.5051, -52.84095, 295.3094),
             vector4(1149.651, 270.502, -52.84095, 245.3094),
-        }
+        },
+        bet = tableBets[1]
     },
     [2] = {
         modelHash = `vw_prop_casino_blckjack_01`,
@@ -33,6 +42,7 @@ local tablesData = {
             vector4(1151.969, 265.9889, -52.84095, 115.3094),
             vector4(1151.026, 265.9921, -52.84095, 65.30935),
         },
+        bet = tableBets[2]
     },
     [3] = {
         modelHash = `vw_prop_casino_blckjack_01b`,
@@ -47,6 +57,7 @@ local tablesData = {
             vector4(1130.165, 262.4864, -52.041, 205.3095),
             vector4(1130.161, 261.5438, -52.041, 155.3094),
         },
+        bet = tableBets[3]
     },
     [4] = {
         modelHash = `vw_prop_casino_blckjack_01b`,
@@ -61,6 +72,7 @@ local tablesData = {
             vector4(1145.187, 247.4638, -52.041, 205.3095),
             vector4(1145.184, 246.5213, -52.041, 155.3094),
         },
+        bet = tableBets[4]
     },
 }
 
@@ -79,7 +91,6 @@ local function createTables()
 end
 
 local function loadingThread()
-    print('Loading blackjack')
     exports.gl_utils:loadAnimDicts(sharedAnimDict)
     exports.gl_utils:loadAnimDicts(playerAnimDict)
     exports.gl_utils:loadAnimDicts(dealerSharedDict)
@@ -140,7 +151,7 @@ function Blackjack_InsideCasino(ped, coords, timer)
     end
 
     if closestTable then
-        exports.gl_utils:drawNotification(string.format("Appuyez sur ~INPUT_ENTER~ pour jouer sur la table de blackjack numéro %d", closestTable.id))
+        exports.gl_utils:drawNotification(string.format("Appuyez sur ~INPUT_ENTER~ pour jouer sur la table de blackjack numéro %d pour ~g~%d$~s~", closestTable.id, closestTable.bet))
     end
 
     local controlPressed = IsControlJustPressed(0, INPUT_ENTER)
@@ -348,7 +359,6 @@ local function blackjackTableRoundStart(tableId)
         return
     end
 
-    print("Starting round on table ", tableId)
     roundStart = true
 end
 RegisterNetEvent("gl_casino:bj:roundStart", blackjackTableRoundStart)
@@ -377,6 +387,25 @@ local function blackjackCheckCards(tableId)
     t:dealerCheckCard()
 end
 RegisterNetEvent("gl_casino:bj:checkCards", blackjackCheckCards)
+
+local function blackjackRoundResult(tableId, amountWon, value, dealerValue)
+    if not usedBlackjackTable then
+        return
+    end
+
+    if usedBlackjackTable.id ~= tableId then
+        return
+    end
+
+    if amountWon > 0 then
+        exports.gl_utils:addFeedNotification('Félicitation ! Tu as gagné ~g~'.. amountWon ..'$~s~ avec une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 210, false)
+    else
+        exports.gl_utils:addFeedNotification('Perdu ! Plus de chance la prochaine fois. Tu avais une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 6, false)
+    end
+
+    currentState = Blackjack_WaitRoundStart
+end
+RegisterNetEvent("gl_casino:bj:roundResult", blackjackRoundResult)
 
 local function blackjackRemoveCards(tableId)
     local t = tables[tableId]

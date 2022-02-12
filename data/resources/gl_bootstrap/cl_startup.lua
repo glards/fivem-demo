@@ -17,7 +17,7 @@ function ClientThread()
         local ped = PlayerPedId()
         if IsPedInAnyVehicle(ped) then
             SetUserRadioControlEnabled(false)
-            if GetPlayerRadioStationName() ~= nil then
+            if GetPlayerRadioStationName() then
                 SetVehRadioStation(GetVehiclePedIsIn(ped),"OFF")
             end
         end

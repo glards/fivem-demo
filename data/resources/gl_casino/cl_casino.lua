@@ -460,7 +460,7 @@ function CreateDealerPed(pos, heading, dealerType)
     local variation = dealerVariations[variationIndex]
     SetPedDefaultComponentVariation(ped)
     for k,v in ipairs(variation) do
-        if v ~= nil then
+        if v then
             SetPedComponentVariation(ped, k-1, v[1], v[2], v[3])
         end
     end
