@@ -67,7 +67,31 @@ function drawInstructionalButtons(data)
     return scaleform
 end
 
+function showCountdown(message, r,g,b)
+    local scaleform = RequestScaleformMovie("COUNTDOWN")
+    while not HasScaleformMovieLoaded(scaleform) do
+        Citizen.Wait(0)
+    end
+
+    BeginScaleformMovieMethod(scaleform, 'SET_MESSAGE')
+    ScaleformMovieMethodAddParamTextureNameString(message)
+    ScaleformMovieMethodAddParamInt(r)
+    ScaleformMovieMethodAddParamInt(g)
+    ScaleformMovieMethodAddParamInt(b)
+    EndScaleformMovieMethod()
+    
+    BeginScaleformMovieMethod(scaleform, 'FADE_MP')
+    ScaleformMovieMethodAddParamTextureNameString(message)
+    ScaleformMovieMethodAddParamInt(r)
+    ScaleformMovieMethodAddParamInt(g)
+    ScaleformMovieMethodAddParamInt(b)
+    EndScaleformMovieMethod()
+
+    DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 255)
+end
+
 exports('addFeedNotification', addFeedNotification)
 exports('drawSubtitle', drawSubtitle)
 exports('drawNotification', drawNotification)
 exports('drawInstructionalButtons', drawInstructionalButtons)
+exports('showCountdown', showCountdown)

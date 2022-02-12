@@ -226,9 +226,13 @@ function Blackjack_WaitRoundStart(ped, coords, timer)
 end
 
 function Blackjack_BetRound(ped, coords, timer)
+    if usedBlackjackTable == nil then
+        return
+    end
+
     local bjControls = {
         { control = INPUT_ENTER, name = "Sortir de la table"},
-        { control = INPUT_TALK, name = "Participer"},
+        { control = INPUT_TALK, name = string.format("Miser %d$", usedBlackjackTable.bet)},
         { control = INPUT_RELOAD, name = "Passer"},
     }
 
@@ -251,10 +255,6 @@ function Blackjack_BetRound(ped, coords, timer)
         TriggerServerEvent("gl_casino:bj:playerSkipRound", usedBlackjackTable.id, seatIndex)
         playerRoundActive = false
         currentState = Blackjack_PlayerRound
-        return
-    end
-
-    if usedBlackjackTable == nil then
         return
     end
 
@@ -396,8 +396,9 @@ local function blackjackRoundResult(tableId, amountWon, value, dealerValue)
     if usedBlackjackTable.id ~= tableId then
         return
     end
-
-    if amountWon > 0 then
+    if value == dealerValue then
+        exports.gl_utils:addFeedNotification('Egalité ! Tu récupères ta mise de ~g~'.. amountWon ..'$~s~ avec une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 70, false)
+    elseif amountWon > 0 then
         exports.gl_utils:addFeedNotification('Félicitation ! Tu as gagné ~g~'.. amountWon ..'$~s~ avec une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 210, false)
     else
         exports.gl_utils:addFeedNotification('Perdu ! Plus de chance la prochaine fois. Tu avais une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 6, false)

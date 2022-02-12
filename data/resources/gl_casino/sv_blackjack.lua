@@ -29,6 +29,19 @@ local tableBets = {
     1500
 }
 
+local function resetTable(t)
+    t.deck = {}
+    t.dealerCards = {}
+    t.betRoundStart = nil
+    t.dealStack = {}
+    
+    for k,v in pairs(t.seats) do
+        v.cards = {}
+        v.roundState = ROUND.NEW
+        v.participantPed = nil
+    end
+end
+
 for i=1,4 do
     tables[i] = {
         id = i,
@@ -43,6 +56,7 @@ for i=1,4 do
             { occupied = false, ped = nil, cards = {} },
         }
     }
+    resetTable(tables[i])
 end
 
 local function hasPlayers(t)
@@ -55,18 +69,6 @@ local function hasPlayers(t)
     return false
 end
 
-local function resetTable(t)
-    t.deck = {}
-    t.dealerCards = {}
-    t.betRoundStart = nil
-    t.dealStack = {}
-    
-    for k,v in pairs(t.seats) do
-        v.cards = {}
-        v.roundState = ROUND.NEW
-        v.participantPed = nil
-    end
-end
 
 local function getTableAndSeat(src, tableId, seatId)
     local t = tables[tableId]
@@ -327,6 +329,7 @@ local function dealerRoundTick(t)
     for k,v in pairs(t.seats) do
         if v.participantPed then
             local won = false
+            local tie = false
             local playerValue = getBlackjackValue(v.cards)
 
             if playerValue > 21 then
@@ -335,11 +338,16 @@ local function dealerRoundTick(t)
                 won = true
             elseif playerValue > dealerValue then
                 won = true
+            elseif playerValue == dealerValue then
+                won = false
+                tie = true
             end
 
             local amountWon = 0
             if won then
-                amountWon = (t.bet*3)/2
+                amountWon = (t.bet*3)//2
+            elseif tie then
+                amountWon = t.bet
             end
 
             TriggerClientEvent("gl_casino:bj:roundResult", v.participantPed, t.id, amountWon, playerValue, dealerValue)
@@ -384,7 +392,7 @@ local running = false
 local function blackjackLoop(tableId)
     while running do
         Citizen.Wait(1000)
-        
+
         local t = tables[tableId]
         if t then
             tableTick(t)
