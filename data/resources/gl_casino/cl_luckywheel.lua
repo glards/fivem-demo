@@ -249,6 +249,7 @@ function playWheelAnim(ped, wheel, force, wheelPosition)
     PlayEntityAnim(wheel, anim, animDict, 1.0, false, true, false, 0.0, 2)
     ForceEntityAiAndAnimationUpdate(wheel)
     Citizen.Wait(0)
+    
     while IsEntityPlayingAnim(wheel, animDict, anim, 3) and GetEntityAnimCurrentTime(wheel, animDict, anim) ~= 1.0 do
         Citizen.Wait(0)
     end

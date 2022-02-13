@@ -1,4 +1,3 @@
-
 local dealerAnim = {
     'idle',
     'female_idle'
@@ -6,6 +5,7 @@ local dealerAnim = {
 
 local dealerSharedDict = 'anim_casino_b@amb@casino@games@shared@dealer@'
 local dealerBlackjackDict = 'anim_casino_b@amb@casino@games@blackjack@dealer'
+
 
 local dealerAnims = {
     DealCardSelf = {
@@ -256,19 +256,9 @@ function BlackjackTable:dealCards(dealResult)
     for k,v in pairs(dealResult) do
         local hand = self.hands[v.seatId] or {}
         local cardIdx = #hand + 1
-        self:dealCard(v.seatId, cardIdx, v.card)
         table.insert(hand, v.card)
         self.hands[v.seatId] = hand
-
-        -- Hide the first card from the dealer
-        if v.seatId == 0 and not self.dealerRevealedCard then
-            if #hand > 1 then
-                local dealerVisibleHand = { hand[2] }
-                TriggerEvent("gl_casino:bj:notifCardDealt", self.id, v.seatId, v.card, dealerVisibleHand)
-            end
-        else
-            TriggerEvent("gl_casino:bj:notifCardDealt", self.id, v.seatId, v.card, hand)
-        end
+        self:dealCard(v.seatId, cardIdx, v.card)
     end
 end
 
@@ -287,6 +277,21 @@ function BlackjackTable:dealerAnim(animData, cb)
         Citizen.Wait(0)
         cb(self.dealerPed, dict, anim)
     end
+end
+
+local function speechCard(seatIdx, handValue)
+    local speech = ''
+    if handValue <= 21 then
+        speech = string.format('MINIGAME_BJACK_DEALER_%d', handValue)
+    else
+        if seatIdx == 0 then
+            speech = 'MINIGAME_DEALER_BUSTS'
+        else
+            speech = 'MINIGAME_BJACK_DEALER_PLAYER_BUST'
+        end
+    end
+
+    return speech
 end
 
 function BlackjackTable:dealCard(seatId, cardIdx, card)
@@ -341,6 +346,19 @@ function BlackjackTable:dealCard(seatId, cardIdx, card)
             DetachEntity(cardEntity, false, true)
             SetEntityCoordsNoOffset(cardEntity, cardPos, false, false, true)
             SetEntityRotation(cardEntity, cardRot, 2, true)
+
+            -- Hide the first card from the dealer
+            local hand = self.hands[seatId]
+            if seatId == 0 and not self.dealerRevealedCard then
+                if #hand > 1 then
+                    local dealerVisibleHand = { hand[2] }
+                    TriggerEvent("gl_casino:bj:notifCardDealt", self.id, seatId, card, dealerVisibleHand)
+                    PlayPedAmbientSpeechNative(ped, speechCard(seatId, getBlackjackValue(dealerVisibleHand)), "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
+                end
+            else
+                TriggerEvent("gl_casino:bj:notifCardDealt", self.id, seatId, card, hand)
+                PlayPedAmbientSpeechNative(ped, speechCard(seatId, getBlackjackValue(hand)), "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
+            end
         end
     end)
 end
@@ -366,12 +384,13 @@ function BlackjackTable:dealerCheckCard()
             DetachEntity(cardEntity, false, true)
             SetEntityCoordsNoOffset(cardEntity, cardPos, false, false, true)
             SetEntityRotation(cardEntity, cardRot, 2, true)
+            
+            TriggerEvent("gl_casino:bj:notifCardDealt", self.id, 0, self.hands[seatId][cardIdx], self.hands[seatId])
+            PlayPedAmbientSpeechNative(ped, speechCard(seatId, getBlackjackValue(self.hands[seatId])), "SPEECH_PARAMS_FORCE_NORMAL_CLEAR")
         end
     end)
 
     self.dealerRevealedCard = true
-    
-    TriggerEvent("gl_casino:bj:notifCardDealt", self.id, 0, self.hands[seatId][cardIdx], self.hands[seatId])
 end
 
 function BlackjackTable:removeCards()

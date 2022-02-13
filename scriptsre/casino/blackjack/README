@@ -1,3 +1,9 @@
+Audio stuff
+-----------
+
+
+AUDIO::PLAY_PED_AMBIENT_SPEECH_NATIVE(ped, &cVar0, "SPEECH_PARAMS_FORCE_NORMAL_CLEAR", 1);
+
 Animation stuff
 ---------------
 

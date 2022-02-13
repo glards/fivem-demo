@@ -240,11 +240,6 @@ local function streamAssets()
     exports.gl_utils:loadModels(machinesSlotReelHashes)
     exports.gl_utils:loadModels(machinesSlotWheelHashes)
     exports.gl_utils:loadAnimDicts(animDicts)
-    RequestScriptAudioBank("dlc_vinewood\\casino_general")
-    RequestScriptAudioBank("dlc_vinewood\\casino_interior_stems")
-    RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_01")
-    RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_02")
-    RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_03")
 end
 
 -- Player thread controls the state of the client playing slot machine

@@ -80,6 +80,12 @@ function enterCasino()
     end
 
     TriggerServerEvent('gl_casino:playerEnterCasino')
+
+    RequestScriptAudioBank("dlc_vinewood\\casino_general")
+    RequestScriptAudioBank("dlc_vinewood\\casino_interior_stems")
+    RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_01")
+    RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_02")
+    RequestScriptAudioBank("dlc_vinewood\\casino_slot_machines_03")
     
     startWallVideo()
     startSlotMachines()
@@ -422,6 +428,23 @@ local dealers = {
     `s_f_y_casino_01`
 }
 
+local dealerVoiceGroups = {
+    `S_M_Y_Casino_01_WHITE_01`,
+    `S_M_Y_Casino_01_ASIAN_01`,
+    `S_M_Y_Casino_01_ASIAN_02`,
+    `S_M_Y_Casino_01_ASIAN_01`,
+    `S_M_Y_Casino_01_WHITE_01`,
+    `S_M_Y_Casino_01_WHITE_02`,
+    `S_M_Y_Casino_01_WHITE_01`,
+    `S_F_Y_Casino_01_ASIAN_01`,
+    `S_F_Y_Casino_01_ASIAN_02`,
+    `S_F_Y_Casino_01_ASIAN_01`,
+    `S_F_Y_Casino_01_ASIAN_02`,
+    `S_F_Y_Casino_01_LATINA_01`,
+    `S_F_Y_Casino_01_LATINA_02`,
+    `S_F_Y_Casino_01_LATINA_01`,
+}
+
 function CreateDealerPed(pos, heading, dealerType)
 
     assert(dealerType >= 1 and dealerType <= 14, "dealerType should be betweeen 1 and 14")
@@ -468,6 +491,8 @@ function CreateDealerPed(pos, heading, dealerType)
     if setPropIndex then
         SetPedPropIndex(ped, 1,0,0,false)
     end
+
+    SetPedVoiceGroup(ped, dealerVoiceGroups[dealerType])
 
     return ped
 end

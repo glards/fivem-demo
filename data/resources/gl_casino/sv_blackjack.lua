@@ -127,20 +127,22 @@ local function betRoundTick(t)
                 TriggerClientEvent("gl_casino:bj:roundStart", v.ped, t.id)
             end
 
-            if v.roundState ~= ROUND.WAIT then
+            if v.participantPed then
                 playerRoundDone = playerRoundDone + 1
             end
         end
     end
 
+    -- If we don't have any player left, go back to waiting
+    if playerCount == 0 then
+        t.state = STATES.WAITING_PLAYER
+        return
+    end
+
     -- All player have chosen their round
     if playerCount == playerRoundDone then
         print(string.format("All players have made their participation choice on table %d", t.id))
-        if playerRoundDone > 0 then
-            t.state = STATES.DEAL_CARDS
-        else
-            t.state = STATES.WAITING_PLAYER
-        end
+        t.state = STATES.DEAL_CARDS
         return
     end
 
@@ -356,22 +358,24 @@ local function dealerRoundTick(t)
         end
     end
 
+
     -- Remove the cards from the field
     local seatsCount = 1
-    
+
     for k,v in pairs(t.seats) do
         if v.participantPed then
             seatsCount = seatsCount + 1
         end
     end
 
+    resetTable(t)
+
     BroadcastCasinoEvent("gl_casino:bj:removeCards", t.id)
 
     Citizen.Wait(seatsCount * REMOVE_DELAY)
-    
+
     print(string.format("Waiting for player on table %d", t.id))
     t.state = STATES.WAITING_PLAYER
-    resetTable(t)
 end
 
 local function tableTick(t)
@@ -466,6 +470,7 @@ local function playerBetRound(tableId, seatId)
     end
 
     --TODO: Register bet amount (t.bet) server side
+
     seat.roundState = ROUND.BET
     seat.participantPed = src
     print(string.format("Participate in round for table %d and seat %d", tableId, seatId))

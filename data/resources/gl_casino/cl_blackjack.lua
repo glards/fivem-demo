@@ -397,7 +397,7 @@ local function blackjackRoundResult(tableId, amountWon, value, dealerValue)
         return
     end
     if value == dealerValue then
-        exports.gl_utils:addFeedNotification('Egalité ! Tu récupères ta mise de ~g~'.. amountWon ..'$~s~ avec une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 70, false)
+        exports.gl_utils:addFeedNotification('Egalité ! Tu récupères ta mise de ~g~'.. amountWon ..'$~s~ avec une main à ~y~'.. value .. '~s~', 70, false)
     elseif amountWon > 0 then
         exports.gl_utils:addFeedNotification('Félicitation ! Tu as gagné ~g~'.. amountWon ..'$~s~ avec une main à ~y~'.. value .. '~s~ contre le croupier à ~y~' .. dealerValue .. '~s~', 210, false)
     else
