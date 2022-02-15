@@ -1,78 +1,46 @@
 
 local wheelPos = 1
-local wheelSpinning = false
-local wheelOccupied = false
 local wheelPed = nil
 
-
-RegisterCommand('setWheel', function(source, args, rawCommand)
-    wheelPos = tonumber(args[1]) or 1
-end, false)
 
 function luckyWheelPlayerEnter(src)
     TriggerClientEvent('gl_casino:luckywheel:setSpin', src, wheelPos)
 end
 
-
-function luckyWheelHandling(event)
+local function playerTakeWheel()
     local src = source
-
-    if event == 'play' then
-        clientPlayLuckyWheel(src, event)
-    elseif event == 'enter' then
-        clientEnterLuckyWheel(src, event)
-    elseif event == 'leave' then
-        clientLeaveLuckyWheel(src, event)
-    else
-        TriggerClientEvent('gl_casino:cl:luckyWheel', src, 'reset')
-    end
-end
-
-RegisterNetEvent('gl_casino:sv:luckyWheel', slotsHandling)
-
-function clientPlayLuckyWheel(src, event)
-    if wheelPed ~= src then
-        TriggerClientEvent('gl_casino:cl:luckyWheel', src, 'reset')
+    if wheelPed then
+        TriggerClientEvent('gl_casino:luckywheel:reset', src)
         return
     end
 
-    BroadcastCasinoEvent('gl_casino:cl:luckyWheel', 'startSpinning')
+    wheelPed = src
+
+    BroadcastCasinoEvent('gl_casino:luckywheel:setOccupied', true)
+end
+RegisterNetEvent('gl_casino:luckywheel:takeWheel', playerTakeWheel)
+
+
+local function playerSpinWheel()
+    local src = source
+    if wheelPed ~= src then
+        TriggerClientEvent('gl_casino:cl:luckywheel:reset', src)
+        return
+    end
+
+    BroadcastCasinoEvent('gl_casino:luckywheel:startSpinning')
 
     Citizen.Wait(10000)
     
     wheelPos = math.random(1, 20)
-    BroadcastCasinoEvent('gl_casino:cl:luckyWheel', 'stopSpinning', wheelPos)
-end
+    BroadcastCasinoEvent('gl_casino:luckywheel:stopSpinning', wheelPos)
 
+    Citizen.Wait(2*20*100 + 1*20*150 + 3000)
 
-function clientEnterLuckyWheel(src, event)
-    if wheelPed then
-        TriggerClientEvent('gl_casino:cl:luckyWheel', src, 'reset')
-        return
-    end
-
-    wheelOccupied = true
-    wheelPed = src
-
-    BroadcastCasinoEvent('gl_casino:cl:luckyWheel', 'setOccupied', true)
-end
-
-function clientLeaveLuckyWheel(src, event)
-    if wheelPed ~= src then
-        return
-    end
-
-    wheelOccupied = false
     wheelPed = nil
-
-    BroadcastCasinoEvent('gl_casino:cl:luckyWheel', 'setOccupied', false)
+    BroadcastCasinoEvent('gl_casino:luckywheel:setOccupied', false)
 end
+RegisterNetEvent('gl_casino:luckywheel:spinWheel', playerSpinWheel)
 
 function luckywheelPlayerLeft(src)
-    if wheelPed == src then
-        wheelOccupied = false
-        wheelPed = nil
-    
-        BroadcastCasinoEvent('gl_casino:cl:luckyWheel', 'setOccupied', false)
-    end
 end

@@ -5,6 +5,7 @@ local wheel = nil
 local wheelPos = 0
 local wheelOccupied = false
 local wheelSpinning = false
+local wheelTarget = nil
 
 local currentState = nil
 
@@ -199,6 +200,7 @@ function LuckyWheel_InsideCasino(ped, coords, timer)
         local enterPressed = IsControlJustPressed(0, INPUT_ENTER)
         if enterPressed then
             currentState = LuckyWheel_PlayAnim
+            TriggerServerEvent('gl_casino:luckywheel:takeWheel')
         end
     end
 end
@@ -207,16 +209,8 @@ function LuckyWheel_PlayAnim(ped, coords, timer)
     local animDict = getAnimDict(ped)
     local anim = anims[1]
 
-    print(animDict, anim)
-    print(luckyWheelAnimPos, luckyWheelAnimRot)
-
-    local wheelRot = vector3(0.0, 0.0, GetEntityHeading(wheel))
-    print(wheelRot)
-
     local animPos = GetAnimInitialOffsetPosition(animDict, anim, luckyWheelAnimPos, luckyWheelAnimRot, 0.0, 2)
     local animRot = GetAnimInitialOffsetRotation(animDict, anim, luckyWheelAnimPos, luckyWheelAnimRot, 0.0, 2)
-
-    print(animPos, animRot)
 
     local duration = 5 -- or 69
     local flag = 0
@@ -226,6 +220,7 @@ function LuckyWheel_PlayAnim(ped, coords, timer)
 
     Citizen.Await(exports.gl_utils:followNavMesh(ped, animPos, luckyWheelAnimRot.z))
 
+    Citizen.CreateThread(playWheel)
     Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim, luckyWheelAnimPos, luckyWheelAnimRot, holdLastFrame, looped, 8.0, 8.0, duration, flag, playbackRate))
 
     anim = anims[11]
@@ -239,31 +234,22 @@ function LuckyWheel_PlayAnim(ped, coords, timer)
     currentState = LuckyWheel_InsideCasino
 end
 
-
-function playWheelAnim(ped, wheel, force, wheelPosition)
-    local prevPosition = wheelPosition
-    local animDict = getAnimDict(ped)
-    local anim = wheelAnims[force][wheelPosition]
-
-    SetEntityRotation(wheel, 0.0, 0.0, 0.0, 2, true)
-    PlayEntityAnim(wheel, anim, animDict, 1.0, false, true, false, 0.0, 2)
-    ForceEntityAiAndAnimationUpdate(wheel)
-    Citizen.Wait(0)
-    
-    while IsEntityPlayingAnim(wheel, animDict, anim, 3) and GetEntityAnimCurrentTime(wheel, animDict, anim) ~= 1.0 do
-        Citizen.Wait(0)
-    end
-    StopEntityAnim(wheel, anim, animDict, -8.0)
-    wheelPosition = (prevPosition + animOffsets[force]) % 20
-
-    return wheelPosition
+local WHEEL_DELAY = 2450
+function playWheel()
+    wheelSpinning = true
+    Citizen.Wait(WHEEL_DELAY)
+    TriggerServerEvent('gl_casino:luckywheel:spinWheel')
+    startSpinning()
 end
-
 
 function nextPos(pos)
     pos = pos - 1
+
     if pos < 1 then
         pos = 20
+    end
+    if pos > 20 then
+        pos = 1
     end
     return pos
 end
@@ -277,40 +263,48 @@ function posToRot(pos)
         pos = 20
     end
 
-    local rot = (pos-1)*-18.0
+    local rot = (pos-1)*18.0
     if rot < 0.0 then
         rot = rot + 360.0
     end
     return rot
 end
 
+local SPIN_DELAY_START = 120.0
+local SPIN_DELAY_NORMAL = 60.0
+local SPIN_DELAY_SLOWING = 100.0
+local SPIN_DELAY_STOPPING = 150.0
 
-RegisterCommand('spin', function(source, args, rawCommand)
-    --wheelPosition = 1
-    if not wheel then
-        return
-    end
-
-    print("Start spinning", wheelPosition)
-
+function startSpinning()
     local ped = PlayerPedId()
 
-    wheelPosition = playWheelAnim(ped, wheel, 3, wheelPosition)
+    --wheelPosition = playWheelAnim(ped, wheel, 3, wheelPosition)
 
     local current = GetGameTimer()
-    local backoff = current + 2000 + math.random(1, 1500)
-    local stopTime = current + 2500 + math.random(1, 1500)
-    local delay = 50.0
+    local delay = SPIN_DELAY_START
     local nextTime = current + math.ceil(delay)
+
     local spinning = true
+    local slowing = false
+    local stopping = false
+
+    local posCount = 0
+    local lastTurn = 0
+
+    local turnSlowing = 2
+    local turnStopping = 1
+
     while spinning do
         local currentRot = posToRot(wheelPosition)
         local nextWheelPosition = nextPos(wheelPosition)
         local nextRot = posToRot(nextWheelPosition)
 
-        print("Continue spinning", wheelPosition)
+        if nextRot > currentRot then
+            currentRot = currentRot + 360.0
+        end
+
         while nextTime > current do
-            local ratio = (nextTime-current)/delay
+            local ratio = 1.0-((nextTime-current)/delay)
             local rot = currentRot + (nextRot - currentRot)*ratio
             SetEntityRotation(wheel, 0.0, rot, 0.0, 2, true)
             Citizen.Wait(0)
@@ -318,34 +312,52 @@ RegisterCommand('spin', function(source, args, rawCommand)
             current = GetGameTimer()
         end
 
-        if current > backoff then
-            delay = delay * 1.5
+        posCount = posCount + 1
+
+        if delay == SPIN_DELAY_START and posCount > 4 then
+            delay = SPIN_DELAY_NORMAL
         end
 
-        wheelPosition = wheelPosition - 1
-        if wheelPosition < 1 then
-            wheelPosition = 20
+        local turn = posCount // 20
+        wheelPosition = nextWheelPosition
+        local isNewTurn = turn ~= lastTurn
+
+        lastTurn = turn
+
+        if isNewTurn then
+            if delay == SPIN_DELAY_NORMAL then
+                if wheelTarget then
+                    delay = SPIN_DELAY_SLOWING
+                end
+            elseif delay == SPIN_DELAY_SLOWING then
+                turnSlowing = turnSlowing - 1
+                if turnSlowing == 0 then
+                    delay = SPIN_DELAY_STOPPING
+                end
+            elseif delay == SPIN_DELAY_STOPPING then
+                turnStopping = turnStopping - 1
+                if turnStopping == 0 then
+                    stopping = true
+                end
+            end
         end
         nextTime = current + math.ceil(delay)
 
-        if current > stopTime then
+
+        if stopping and wheelPosition == wheelTarget then
             spinning = false
         end
     end
 
-    print("Stopped spinning", wheelPosition)
-end, false)
+    wheelPosition = wheelTarget
+    wheelTarget = nil
+    SetEntityRotation(wheel, 0.0, posToRot(wheelPosition), 0.0, 2, true)
+end
 
-RegisterCommand('wheel', function(source, args, rawCommand)
-    local idx = tonumber(args[1]) or 1
-    local rot = posToRot(idx)
+RegisterCommand('wheelPos', function(source, args, rawCommand)
+    local pos = tonumber(args[1]) or 1
+    SetEntityRotation(wheel, 0.0, posToRot(pos), 0.0, 2, true)
 
-    if not wheel then
-        return
-    end
-
-    SetEntityRotation(wheel, 0.0, rot, 0.0, 2, true)
-    wheelPosition = idx
 end, false)
 
 RegisterNetEvent('gl_casino:luckywheel:setSpin')
@@ -355,35 +367,26 @@ AddEventHandler('gl_casino:luckywheel:setSpin', function(pos)
     SetEntityRotation(wheel, 0.0, rot, 0.0, 2, true)
 end)
 
-RegisterNetEvent('gl_casino:luckywheel:spinTo')
-AddEventHandler('gl_casino:luckywheel:spinTo', function(pos)
-end)
-
-RegisterNetEvent('gl_casino:cl:luckywheel', function (event, arg1)
-    if event == 'startSpinning' then
-        luckywheelStartSpinning()
-    elseif event == 'stopSpinning' then
-        luckywheelStopSpinning(arg1)
-    elseif event == 'setOccupied' then
-        luckywheelSetOccupied(arg1)
-    elseif event == 'reset' then
-        luckywheelReset()
+local function luckywheelStartSpinning()
+    if not wheelSpinning then
+        startSpinning()
     end
-end)
-
-function luckywheelStartSpinning()
-    wheelPos = nil
-    wheelSpinning = true
 end
+RegisterNetEvent('gl_casino:luckywheel:startSpinning', luckywheelStartSpinning)
 
-function luckywheelStopSpinning(pos)
-    wheelPos = pos
+local function luckywheelStopSpinning(pos)
+    wheelTarget = pos
+    wheelSpinning = false
 end
+RegisterNetEvent('gl_casino:luckywheel:stopSpinning', luckywheelStopSpinning)
 
-function luckywheelSetOccupied(occupied)
+local function luckywheelSetOccupied(occupied)
     wheelOccupied = occupied
 end
+RegisterNetEvent('gl_casino:luckywheel:setOccupied', luckywheelSetOccupied)
 
-function luckywheelReset()
+local function luckywheelReset()
     currentState = LuckyWheel_InsideCasino
+    wheelTarget = nil
 end
+RegisterNetEvent('gl_casino:luckywheel:reset', luckywheelReset)
