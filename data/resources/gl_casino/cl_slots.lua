@@ -592,9 +592,14 @@ local function slotsStopSpinning(id, reel1, reel2, reel3, won, amount)
     end
     local slotMachine = slotMachineInstances[id]
     slotMachine:stopSpinning(reel1, reel2, reel3, function ()
+        if not usedSlotmachine then
+            return
+        end
+
         if usedSlotmachine.id ~= id then
             return
         end
+        
         if won then
             exports.gl_utils:addFeedNotification('Bravo ! Tu as gagné ~g~'..amount..'$~s~', 210, false)
         else

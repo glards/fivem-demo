@@ -354,11 +354,6 @@ function startSpinning()
     SetEntityRotation(wheel, 0.0, posToRot(wheelPosition), 0.0, 2, true)
 end
 
-RegisterCommand('wheelPos', function(source, args, rawCommand)
-    local pos = tonumber(args[1]) or 1
-    SetEntityRotation(wheel, 0.0, posToRot(pos), 0.0, 2, true)
-
-end, false)
 
 RegisterNetEvent('gl_casino:luckywheel:setSpin')
 AddEventHandler('gl_casino:luckywheel:setSpin', function(pos)

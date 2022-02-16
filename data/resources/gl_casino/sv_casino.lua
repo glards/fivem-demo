@@ -4,6 +4,7 @@ local casinoPeds = {}
 
 function playerEnterCasino()
     local src = source
+
     addPeds(src)
     luckyWheelPlayerEnter(src)
 end
