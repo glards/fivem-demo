@@ -2,9 +2,9 @@
 # FiveM dev portfolio
 
 ## Casino reimplementation
- * Slot machines
-![SlotMachines demo](/docs/SlotMachine.gif)
+[![Casino demo video](https://img.youtube.com/vi/A4gcAv3gnvE/maxresdefault.jpg)](https://youtu.be/A4gcAv3gnvE
 
+ * Slot machines
  * Lucky wheel
  * Roulette
 
