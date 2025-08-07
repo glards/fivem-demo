@@ -16,3 +16,14 @@ local function ping(clientTimestamp)
     TriggerClientEvent('gl_admin:pong', src, clientTimestamp, currentTimestamp)
 end
 RegisterNetEvent('gl_admin:ping', ping)
+
+
+AddEventHandler("playerEnteredScope", function(data)
+    local playerEntering, player = data["player"], data["for"]
+    print(("%s is entering %s's scope"):format(playerEntering, player))
+end)
+
+AddEventHandler("playerLeftScope", function(data)
+    local playerLeaving, player = data["player"], data["for"]
+    print(("%s is leaving %s's scope"):format(playerLeaving, player))
+end)

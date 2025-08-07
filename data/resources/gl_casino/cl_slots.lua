@@ -239,6 +239,7 @@ local usedSlotmachine = nil
 local function streamAssets()
     exports.gl_utils:loadModels(machinesSlotReelHashes)
     exports.gl_utils:loadModels(machinesSlotWheelHashes)
+    
     exports.gl_utils:loadAnimDicts(animDicts)
 end
 
@@ -329,7 +330,12 @@ function Slots_WalkAndSit(ped, coords, timer)
 
     Citizen.Await(exports.gl_utils:followNavMesh(ped, animPos, animRot.z))
 
+    TriggerServerEvent('capture:startTrace')
+    Citizen.Wait(0)
+    print(animDict, anim[1])
     Citizen.Await(exports.gl_utils:playNetworkSynchronizedScene(ped, animDict, anim[1], usedSlotmachine.pos.xyz, machineRot, anim[2], anim[3], 2.0, -1.5, 13, 16, 2.0))
+    Citizen.Wait(0)
+    TriggerServerEvent('capture:stopTrace')
 
     currentState = Slots_Idle
 end

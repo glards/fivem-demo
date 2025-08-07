@@ -7,10 +7,17 @@ RegisterCommand('svspawn', function(source, args, rawCommand)
         return
     end
 
+    local movePlayerInside = true
     local ped = PlayerPedId()
     local forward, right, up, pos = GetEntityMatrix(ped)
     local head = GetEntityHeading(ped)
 
-    TriggerServerEvent('gl_garage:spawn', vehicleName, pos.x, pos.y, pos.z, head)
+    if #args == 5 then
+        pos = vector3(tonumber(args[2]), tonumber(args[3]), tonumber(args[4]))
+        head = tonumber(args[5])
+        movePlayerInside = false
+    end
+
+    TriggerServerEvent('gl_garage:spawn', vehicleName, pos.x, pos.y, pos.z, head, movePlayerInside)
 
 end, false)

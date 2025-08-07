@@ -86,7 +86,7 @@ RegisterCommand('golfon', function(source, args, rawCommand)
 end, false)
 
 function golfThread()
-    local hole = 1
+    local hole = 3
     local ped = PlayerPedId()
     local data = holes[hole]
 

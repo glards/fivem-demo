@@ -1,15 +1,73 @@
 
-local roulettePos = {
-    vector4(1144.814, 268.2634, -52.8409, -135.0),
-    vector4(1150.355, 262.7224, -52.8409, 45.0),
-    vector4(1133.958, 262.1071, -52.0409, 135.0),
-    vector4(1129.595, 267.2637, -52.0409, -45.0),
-    vector4(1144.618, 252.2411, -52.0409, -45.0),
-    vector4(1148.981, 247.0846, -52.0409, 135.0)
+local rouletteProp = {
+    `vw_prop_casino_roulette_01`,
+    `vw_prop_casino_roulette_01b`
+}
+
+local roulettesData = {
+    [1] = {
+        modelHash = rouletteProp[1],
+        pos = vector4(1144.814, 268.2634, -52.8409, -135.0),
+        seats = {
+            vector4(1144.342773, 269.022430, -52.840900, 314.999969),
+            vector4(1143.655518, 268.335205, -52.840900, 314.999969),
+            vector4(1143.748901, 267.377502, -52.840900, 44.999958),
+            vector4(1144.717041, 267.277527, -52.840900, 135.000000)
+        },
+    },
+    [2] = {
+        modelHash = rouletteProp[1],
+        pos = vector4(1150.355, 262.7224, -52.8409, 45.0),
+        seats = {
+            vector4(1150.826172, 261.963379, -52.840900, 134.999985),
+            vector4(1151.513428, 262.650604, -52.840900, 134.999985),
+            vector4(1151.420044, 263.608307, -52.840900, 224.999985),
+            vector4(1150.451904, 263.708282, -52.840900, 315.000031)
+        },
+    },
+    [3] = {
+        modelHash = rouletteProp[1],
+        pos = vector4(1133.958, 262.1071, -52.0409, 135.0),
+        seats = {
+            vector4(1134.717041, 262.578339, -52.040901, 224.999985),
+            vector4(1134.029785, 263.265564, -52.040901, 224.999985),
+            vector4(1133.072144, 263.172180, -52.040901, 314.999969),
+            vector4(1132.972168, 262.204041, -52.040901, 45.000015)
+        },
+    },
+    [4] = {
+        modelHash = rouletteProp[0],
+        pos = vector4(1129.595, 267.2637, -52.0409, -45.0),
+        seats = {
+            vector4(1128.835938, 266.792450, -52.040901, 44.999954),
+            vector4(1129.523193, 266.105225, -52.040901, 44.999954),
+            vector4(1130.480835, 266.198608, -52.040901, 134.999939),
+            vector4(1130.580811, 267.166748, -52.040901, 225.000000)
+        },
+    },
+    [5] = {
+        modelHash = rouletteProp[0],
+        pos = vector4(1144.618, 252.2411, -52.0409, -45.0),
+        seats = {
+            vector4(1143.859009, 251.769852, -52.040901, 44.999954),
+            vector4(1144.546265, 251.082626, -52.040901, 44.999954),
+            vector4(1145.503906, 251.176010, -52.040901, 134.999939),
+            vector4(1145.603882, 252.144119, -52.040901, 225.000000)
+        },
+    },
+    [6] = {
+        modelHash = rouletteProp[0],
+        pos = vector4(1148.981, 247.0846, -52.0409, 135.0),
+        seats = {
+            vector4(1149.739990, 247.555847, -52.040901, 224.999985),
+            vector4(1149.052734, 248.243073, -52.040901, 224.999985),
+            vector4(1148.095093, 248.149689, -52.040901, 314.999969),
+            vector4(1147.995117, 247.181580, -52.040901, 45.000015)
+        },
+    },
 }
 
 local dealerOffset = vector3(-0.68, 0.97, 0.0)
-
 
 local dealersAnimDicts = {
     'anim_casino_b@amb@casino@games@roulette@dealer',
@@ -20,12 +78,6 @@ local tableAnimDict = 'anim_casino_b@amb@casino@games@roulette@table'
 
 local playerAnimDict = 'anim_casino_b@amb@casino@games@roulette@player'
 
-
-local rouletteProp = {
-    `vw_prop_casino_roulette_01`,
-    `vw_prop_casino_roulette_01b`
-}
-
 local markerProp = {
     `vw_prop_vw_marker_01a`,
     `vw_prop_vw_marker_02a`
@@ -33,29 +85,11 @@ local markerProp = {
 
 local rouletteBallProp = `vw_prop_roulette_ball`
 
-function createRoulette()
-    local roulette = {}
-
-    roulette.__index = roulette
-
-    function roulette:new()
-        local o = {}
-        setmetatable(o, roulette)
-        return o
-    end
-
-    function roulette:tick()
-    end
-
-    return roulette
-end
-
-
 local rouletteDealers = {}
 
 function CreateDealer()
-    for i=1,#roulettePos do
-        local posHeading = roulettePos[i]
+    for k,v in pairs(roulettesData) do
+        local posHeading = v.pos
 
         local pos = posHeading.xyz
         local heading = posHeading.w
@@ -100,8 +134,8 @@ function CreateRoulette()
         end
     end
 
-    for i=1,#roulettePos do
-        local posHeading = roulettePos[i]
+    for k,v in pairs(roulettesData) do
+        local posHeading = v.pos
 
         local pos = posHeading.xyz
         local heading = posHeading.w
@@ -110,7 +144,7 @@ function CreateRoulette()
             heading = heading + 360.0
         end
 
-        local roulette = CreateObjectNoOffset(rouletteProp[1], pos, false, false, false)
+        local roulette = CreateObjectNoOffset(v.modelHash, pos, false, false, false)
         SetEntityHeading(roulette, heading)
 
         table.insert(rouletteObjects, roulette)
@@ -131,12 +165,84 @@ local function loadingThread()
     CreateRoulette()
 end
 
+local function playerThread()
+    local ped = PlayerPedId()
+    
+    StartAudioScene("dlc_vw_casino_slot_machines_playing")
+
+    currentState = Roulette_InsideCasino
+
+    while running do
+        Citizen.Wait(0)
+
+        local timer = GetGameTimer()
+        local coords = GetEntityCoords(ped)
+
+        if currentState then
+            currentState(ped, coords, timer)
+        end
+    end
+end
+
+local running = false
+local currentState = nil
+
 function startRoulette()
-    Citizen.CreateThread(loadingThread)
+    if running then
+        return
+    end
+
+    running = true
+
+    loadingThread()
+    Citizen.CreateThread(playerThread)
+end
+
+local usedRouletteTable = nil
+
+function Roulette_InsideCasino(ped, coords, timer)
+    local closestTable = nil
+    local closestTableDistance = 3.0
+
+    for tableId, roulette in pairs(roulettesData) do
+        local dist = #(coords - roulette.pos.xyz)
+
+        if dist < closestTableDistance then
+            closestTableDistance = dist
+            closestTable = broulette
+        end
+    end
+
+    if closestTable then
+        exports.gl_utils:drawNotification(string.format("Appuyez sur ~INPUT_ENTER~ pour jouer sur la table de roulette numéro %d", closestTable.id))
+    end
+
+    local controlPressed = IsControlJustPressed(0, INPUT_ENTER)
+    if controlPressed and closestTable then
+        usedRouletteTable = closestTable
+
+        local closestSeatDistance = 3.0
+        local closestSeatId = nil
+        for seatId, seatPos in pairs(usedRouletteTable.seats) do
+
+            if not usedRouletteTable.seatsOccupied[seatId] then
+                local dist = #(coords - seatPos.xyz)
+                if dist < closestSeatDistance then
+                    closestSeatId = seatId
+                    closestSeatDistance = dist
+                end
+            end
+        end
+
+        -- if closestSeatId then
+        --     seatIndex = closestSeatId
+        --     currentState = Blackjack_WalkAndSit
+        --     TriggerServerEvent("gl_casino:bj:playerSitAtTable", usedBlackjackTable.id, seatIndex)
+        -- end
+    end
 end
 
 function stopRoulette()
-    print('Clearing roulette peds and objects')
     for k,v in ipairs(rouletteDealers) do
         DeleteEntity(v)
     end
@@ -150,8 +256,6 @@ end
 RegisterCommand('roulette', function(source, args, rawCommand)
 
 end, false)
-
-
 
 --- Copied functions
 function func_4510(iParam0, iParam1)

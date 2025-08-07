@@ -91,7 +91,7 @@ function enterCasino()
     startSlotMachines()
     startLuckyWheel()
     startBlackjack()
-    -- startRoulette()
+    startRoulette()
 end
 
 function leaveCasino()
@@ -103,7 +103,7 @@ function leaveCasino()
     stopSlotMachines()
     stopLuckyWheel()
     stopBlackjack()
-    -- stopRoulette()
+    stopRoulette()
 end
 
 local running = false

@@ -28,3 +28,4 @@ local function pong(clientTimestamp, serverTimestamp)
     print(string.format("RTT : %d ms | Ping : %d ms", rtt, ping))
 end
 RegisterNetEvent('gl_admin:pong', pong)
+

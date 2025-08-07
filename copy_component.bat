@@ -1,0 +1,1 @@
+xcopy "D:\Perso\glards-scripting-external\src\component\glards-scripting-external\out\build\x64-Release\bin\*.dll" "D:\Perso\fivem-demo\.server" /Y
